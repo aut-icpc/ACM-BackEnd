@@ -1,0 +1,20 @@
+{
+    "python.pythonPath": "C:\\Program Files\\Python36\\python.exe",
+    "editor.formatOnSave": true,
+    "python.linting.pep8Enabled": true,
+    "python.linting.pylintPath": "pylint",
+    "python.linting.pylintArgs": ["--load-plugins", "pylint_django"],
+    "python.linting.pylintEnabled": true,
+    "python.jediEnabled": true,
+    "python.analysis.disabled": [
+        "unresolved-import"
+    ],
+    "python.autoComplete.extraPaths": [
+        "./icpcsite/mainsite"
+    ],
+    // "python.venvPath": "${workspaceFolder}/env/bin/python3",
+    "python.linting.pep8Args": ["--ignore=E501"],
+    "files.exclude": {
+      "**/*.pyc": true
+    }
+  }
