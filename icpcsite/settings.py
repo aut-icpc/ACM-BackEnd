@@ -87,8 +87,14 @@ WSGI_APPLICATION = 'icpcsite.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        # 'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'acm',
+        'USER': 'postgres',
+        'PASSWORD': 'acm',
+        'HOST': 'localhost',
+        'PORT': '5432',
+        # 'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 
@@ -134,6 +140,8 @@ STATIC_URL = '/static/'
 # CORS_ORIGIN_WHITE_LIST = [
 #     "http://localhost:3000/*",
 # ]
+
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'mainsite')
 
 CORS_ORIGIN_ALLOW_ALL = True
 
