@@ -4,13 +4,13 @@ from mainsite.models import (
     Countdown,
 )
 
+
 class TimeLineItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = TimeLineItem
-        fields = ['dateText', 'style', 'dateInnerStyle',
-         'title', 'innerHTML']
+        fields = '__all__'
 
 class CountdownSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Countdown 
-        fields = ['stopTime',]
+        model = Countdown
+        fields = ['stopTime', ]
