@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import ValidationError
 
 # Create your models here.
 
@@ -19,6 +20,11 @@ class Countdown(models.Model):
 
     def __str__(self):
         return "Homepage countdown time"
+
+    def save(self, *args, **kwargs):
+        if Countdown.objects.exists() and not self.pk:
+            raise ValidationError('There can be only one Countdown')
+        return super(Countdown, self).save(*args, **kwargs)
 
 
 # class Contest(models.Model):

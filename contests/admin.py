@@ -2,10 +2,10 @@ from django.contrib import admin
 from .models import ACM 
 
 class ACMContestAdmin(admin.ModelAdmin):
-    list_display_link = ('title', 'problems', 'ranklist(online)','ranklist(onsite)' ,'test data','judge solution')
-    list_display = ('title','problems', 'ranklist(online)','ranklist(onsite)' ,'test data','judge solution' )
+    list_display_link = ('title', 'problems', 'final_ranking_onsite', 'final_ranking_online', 'test_data', 'judge_solution')
+    list_display = ('title', 'problems', 'final_ranking_onsite', 'final_ranking_online', 'test_data', 'judge_solution' )
     # list_filter = ('title',)
-    search_fields = [ 'title']
+    search_fields = ['title']
     # raw_id_fields = ['casts', 'director', ]
 
 
