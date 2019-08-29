@@ -88,23 +88,11 @@ WSGI_APPLICATION = 'icpcsite.wsgi.application'
 
 DATABASES = {
     'default': {
-        # Postgres
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        # Global:
-        'NAME': '***REMOVED***',
-        'USER': '***REMOVED***',
-        'PASSWORD': '***REMOVED***',
-        'PORT': '5432',
-        'HOST': '***REMOVED***'
-
-        # Local:
-        # 'NAME': 'acm',
-        # 'USER': 'postgres',
-        # 'PASSWORD': 'acm',
-        # 'HOST': 'localhost',
-        # 'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
 
 
 # Password validation
