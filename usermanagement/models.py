@@ -5,9 +5,9 @@ from django.core.validators import RegexValidator
 # Create your models here.
 
 EDU_LEVEL_CHOICES = (
-    ('bsc', 'BSc'),
-    ('msc', 'MSc'),
-    ("phd", 'PhD')
+    ('BSC', 'BSc'),
+    ('MSC', 'MSc'),
+    ("PHD", 'PhD')
 )
 
 GENDER_CHOICES = (
@@ -15,7 +15,7 @@ GENDER_CHOICES = (
     ('F', 'Female')
 )
 
-T_SHIRT_SIZE = (
+T_SHIRT_SIZE_CHOICES = (
     ('S', 'Small'),
     ('M', 'Medium'),
     ('L', 'Large'),
@@ -24,33 +24,55 @@ T_SHIRT_SIZE = (
     ('3XL', '3X-Large')
 )
 
+TEAM_STATUS_CHOICES = (
+    ('PENDING', 'Pending Payment'),
+    ('PAID', 'Paid'),
+    ('APPROVED', 'Approved for participation'),
+    ('REJECTED', 'Denied Participation'),
+    ('RESERVED', 'Reserved registration beforehand')
+)
+
 class Country(models.Model):
     name = models.CharField(max_length=255)
     flag = models.ImageField()
     class Meta:
         verbose_name_plural = 'Countries'
 
+    def __str__(self):
+        return self.name
+
 class Team(models.Model):
-    name = models.CharField(max_length=255)
-    is_onsite = models.BooleanField()
-    
+    name = models.CharField(max_length=255, default="", blank=True)
+    is_onsite = models.BooleanField(default=False)
+    status = models.CharField(max_length=50, choices=TEAM_STATUS_CHOICES, default='PENDING')
+    institution = models.CharField(max_length=255, default="")
+    country = models.ForeignKey(Country, on_delete=models.CASCADE, default="", blank=True)
+
+    def __str__(self):
+        return self.status
+
 
 class Contestant(models.Model):
-    edu_level = models.CharField(max_length=3, choices=EDU_LEVEL_CHOICES)
-    email = models.CharField(max_length=255)
-    first_name = models.CharField(max_length=255)
-    gender = models.CharField(max_length=5, choices=GENDER_CHOICES)
-    last_name = models.CharField(max_length=255)
-
     phone_regex = RegexValidator(regex="09[0-9]{9}", message="Phone number must be entered correctly.")
+
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    gender = models.CharField(max_length=5, choices=GENDER_CHOICES)
+    edu_level = models.CharField(max_length=3, choices=EDU_LEVEL_CHOICES, default='BSC')
+    student_number = models.CharField(max_length=255, default="")
+    email = models.CharField(max_length=255)
     phone_number = models.CharField(validators=[phone_regex], max_length=12, blank=True)
 
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.first_name + " " + self.last_name
+
 
 class OnlineContestant(Contestant):
-    country = models.ForeignKey(Country, on_delete=models.CASCADE)
+    pass
+    
 
 class OnsiteContestant(Contestant):
-    shirt_size = models.CharField(max_length=20, choices=T_SHIRT_SIZE)
+    shirt_size = models.CharField(max_length=20, choices=T_SHIRT_SIZE_CHOICES, default='M')
     
