@@ -20,9 +20,10 @@ class TeamSerializer(serializers.ModelSerializer):
         fields = ['name', 'is_onsite', 'status', 'institution', 'country']
 
 class TeamListSerializer(serializers.ModelSerializer):
+    country = serializers.SlugRelatedField(slug_field='name', read_only=True)
     class Meta:
-        model = TeamListSerializer
-        fields = ['name', 'institution', 'status']
+        model = Team
+        fields = ['name', 'institution', 'status', 'country']
 
 class OnsiteContestantSerializer(serializers.ModelSerializer):
     team = serializers.CharField(max_length=255)
@@ -41,7 +42,6 @@ class OnsiteContestantSerializer(serializers.ModelSerializer):
         return obj
 
     
-
 class OnlineContestantSerializer(serializers.ModelSerializer):
     class Meta:
         model = OnlineContestant 
