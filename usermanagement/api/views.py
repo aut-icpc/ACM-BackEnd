@@ -14,6 +14,7 @@ from usermanagement.models import (
 from .serializers import (
     CountrySerializer,
     TeamSerializer,
+    TeamListSerializer,
     OnlineContestantSerializer,
     OnsiteContestantSerializer
 )
@@ -24,11 +25,11 @@ class CountryListView(ListAPIView):
 
 class TeamListView(ListAPIView):
     queryset = Team.objects.all()
-    serializer_class = TeamSerializer
+    serializer_class = TeamListSerializer
 
-class TeamDetailView(RetrieveAPIView):
-    queryset = Team.objects.all()
-    serializer_class = TeamSerializer
+# class TeamDetailView(RetrieveAPIView):
+#     queryset = Team.objects.all()
+#     serializer_class = TeamSerializer
 
 class TeamCreateView(CreateAPIView):
     queryset = Team.objects.all()

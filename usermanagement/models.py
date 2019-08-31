@@ -42,28 +42,32 @@ class Country(models.Model):
         return self.name
 
 class Team(models.Model):
-    name = models.CharField(max_length=255, default="", blank=True)
+    name = models.CharField(max_length=255, default="", unique=True)
     is_onsite = models.BooleanField(default=False)
     status = models.CharField(max_length=50, choices=TEAM_STATUS_CHOICES, default='PENDING')
     institution = models.CharField(max_length=255, default="")
-    country = models.ForeignKey(Country, on_delete=models.CASCADE, default="", blank=True)
+    country = models.ForeignKey(Country, on_delete=models.CASCADE)
 
     def __str__(self):
-        return self.status
+        return self.name
 
 
 class Contestant(models.Model):
-    phone_regex = RegexValidator(regex="09[0-9]{9}", message="Phone number must be entered correctly.")
+    # phone_regex = RegexValidator(regex="09[0-9]{9}", message="Phone number must be entered correctly.")
 
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     gender = models.CharField(max_length=5, choices=GENDER_CHOICES)
     edu_level = models.CharField(max_length=3, choices=EDU_LEVEL_CHOICES, default='BSC')
     student_number = models.CharField(max_length=255, default="")
-    email = models.CharField(max_length=255)
-    phone_number = models.CharField(validators=[phone_regex], max_length=12, blank=True)
+    email = models.CharField(max_length=255, unique=True)
+    # phone_number = models.CharField(validators=[phone_regex], max_length=12, unique=True)
+    phone_number = models.CharField(max_length=20, unique=True)
 
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
+
+    # class Meta:
+    #     unique_together = ["email", "phone_number"]
 
     def __str__(self):
         return self.first_name + " " + self.last_name

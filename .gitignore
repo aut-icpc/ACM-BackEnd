@@ -1,3 +1,4 @@
 *.json
 *.sqlite3
 /icpcsite/settings.py
+*.pyc
