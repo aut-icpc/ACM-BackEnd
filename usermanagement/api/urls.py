@@ -3,7 +3,7 @@ from django.urls import path
 from .views import (
     CountryListView,
     TeamListView,
-    TeamDetailView,
+    # TeamDetailView,
     TeamCreateView,
     OnlineContestantCreateView,
     OnsiteContestantCreateView,
