@@ -1,11 +1,12 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import ACM 
+from .models import ACM ,image
+
 
 class ACMContestAdmin(admin.ModelAdmin):
     # list_display_link = ('title', )
     list_display = ('title','show_problem',
-    'show_final_ranking_onsite' ,'show_final_ranking_online', )
+    'show_final_ranking_onsite' ,'show_final_ranking_online','images' )
     # list_filter = ('title',)
     search_fields = [ 'title']
 
@@ -31,6 +32,7 @@ class ACMContestAdmin(admin.ModelAdmin):
 
 
 admin.site.register(ACM, ACMContestAdmin)
+admin.site.register(image)
 
 
 # class MoviesAdmin(admin.ModelAdmin):
