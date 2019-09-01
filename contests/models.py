@@ -1,7 +1,8 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
-
-
+from sorl.thumbnail import ImageField
+from sorl.thumbnail import get_thumbnail
+from sorl.thumbnail import delete
 
 
 class ACM (models.Model):
@@ -21,11 +22,14 @@ class ACM (models.Model):
         verbose_name_plural = 'CONTESTS'    
 
 class Image(models.Model):
-    src = models.CharField(max_length = 500)
-    thumbnail = models.CharField(max_length = 500)
-    thumbnailheight = 300   
-    thumbnailwidth = 400
-    images = models.ForeignKey(ACM, blank=True, null=True , related_name="contest" , on_delete= models.CASCADE)
+    # in alakie baad kelass mokhstam check konam
+    im = get_thumbnail(my_file, '300x400', crop='center', quality=99)
+    
+    # src = models.CharField(max_length = 500)
+    # thumbnail = models.CharField(max_length = 500)
+    # thumbnailheight = 300   
+    # thumbnailwidth = 400
+    contest = models.ForeignKey(ACM, blank=True, null=True , related_name="contest" , on_delete= models.CASCADE)
     def __str__(self):
         return self.src
 
