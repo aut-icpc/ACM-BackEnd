@@ -6,15 +6,18 @@ from rest_framework.generics import (
 
 from usermanagement.models import (
     Country,
-    Team,
+    OnlineTeam,
+    OnsiteTeam,
     OnlineContestant,
     OnsiteContestant
 )
 
 from .serializers import (
     CountrySerializer,
-    TeamSerializer,
-    TeamListSerializer,
+    OnsiteTeamSerializer,
+    OnlineTeamSerializer,
+    OnsiteTeamListSerializer,
+    OnlineTeamListSerializer,
     OnlineContestantSerializer,
     OnsiteContestantSerializer
 )
@@ -23,26 +26,30 @@ class CountryListView(ListAPIView):
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
 
-class TeamListView(ListAPIView):
-    queryset = Team.objects.all()
-    serializer_class = TeamListSerializer
+class OnlineTeamListView(ListAPIView):
+    queryset = OnlineTeam.objects.all()
+    serializer_class = OnlineTeamListSerializer
 
-# class TeamDetailView(RetrieveAPIView):
-#     queryset = Team.objects.all()
-#     serializer_class = TeamSerializer
+class OnsiteTeamListView(ListAPIView):
+    queryset = OnsiteTeam.objects.all()
+    serializer_class = OnsiteTeamListSerializer
 
-class TeamCreateView(CreateAPIView):
-    queryset = Team.objects.all()
-    serializer_class = TeamSerializer
+class OnlineTeamCreateView(CreateAPIView):
+    queryset = OnlineTeam.objects.all()
+    serializer_class = OnlineTeamSerializer
 
-class OnlineContestantCreateView(CreateAPIView):
-    queryset = OnlineContestant.objects.all()
-    serializer_class = OnlineContestantSerializer
+class OnsiteTeamCreateView(CreateAPIView):
+    queryset = OnsiteTeam.objects.all()
+    serializer_class = OnsiteTeamSerializer
 
-class OnsiteContestantCreateView(CreateAPIView):
-    queryset = OnsiteContestant.objects.all()
-    serializer_class = OnsiteContestantSerializer
 
-# class OnlineContestantDetailView(RetrieveAPIView):
+
+# class FullTeams
+# class OnlineContestantCreateView(CreateAPIView):
 #     queryset = OnlineContestant.objects.all()
-#     serializer_class = CountrySerializer
+#     serializer_class = OnlineContestantSerializer
+
+# class OnsiteContestantCreateView(CreateAPIView):
+#     queryset = OnsiteContestant.objects.all()
+#     serializer_class = OnsiteContestantSerializer
+
