@@ -1,8 +1,12 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import ACM 
+from .models import (Contest, Gallery, Photo)
+from photologue.admin import GalleryAdmin as RawGalleryAdmin
+from photologue.admin import RawPhotoAdmin
+from photologue.models import Photo
+from django import forms
 
-class ACMContestAdmin(admin.ModelAdmin):
+class ContestAdmin(admin.ModelAdmin):
     # list_display_link = ('title', )
     list_display = ('title','show_problem',
     'show_final_ranking_onsite' ,'show_final_ranking_online', )
@@ -21,24 +25,29 @@ class ACMContestAdmin(admin.ModelAdmin):
         return format_html("<a href='{url}'>{text}</a>", url="//www.google.com", text="ranking online")
     show_final_ranking_online.short_description = " final ranking online"
 
-    # def show_test_data(self, obj):
-    #     return format_html("<a href='{url}'>{text}</a>", url="//www.google.com", text="test_data")
-    # show_test_data.short_description = "test_data"
-
-    # def show_judge_solution(self, obj):
-    #     return format_html("<a href='{url}'>{text}</a>", url="//www.google.com", text="judje_solution")
-    # show_judge_solution.short_description = "judge_solution"
+admin.site.register(Contest, ContestAdmin)
 
 
-admin.site.register(ACM, ACMContestAdmin)
+class GalleryAdminForm(forms.ModelForm):
+    """Users never need to enter a description on a gallery."""
+
+    class Meta:
+        model = Gallery
+        exclude = ['description']
 
 
-# class MoviesAdmin(admin.ModelAdmin):
-#     list_display_link = ('title', 'runtime', 'director', 'vote_average')
-#     list_display = ('title', 'runtime', 'director', 'vote_average')
-#     list_filter = ('is_adult',)
-#     search_fields = ['director__name', 'title']
-#     raw_id_fields = ['casts', 'director', ]
+class GalleryAdmin(RawGalleryAdmin):
+    list_display = ('contest', 'title', 'date_added', 'photo_count', 'is_public')
+    form = GalleryAdminForm
 
+admin.site.register(Gallery, GalleryAdmin)
 
-# admin.site.register(Movie, MoviesAdmin)
+class PhotoAdminForm(forms.ModelForm):
+    class Meta:
+        model = Photo
+        fields = '__all__'
+
+class PhotoAdmin(RawPhotoAdmin):
+    form = PhotoAdminForm
+
+admin.site.register(Photo, PhotoAdmin)

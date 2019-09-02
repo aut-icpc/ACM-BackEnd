@@ -42,10 +42,10 @@ class Country(models.Model):
         return self.name
 
 class Team(models.Model):
-    name = models.CharField(max_length=255, default="", unique=True)
+    name = models.CharField(max_length=255, unique=True)
     is_onsite = models.BooleanField(default=False)
     status = models.CharField(max_length=50, choices=TEAM_STATUS_CHOICES, default='PENDING')
-    institution = models.CharField(max_length=255, default="")
+    institution = models.CharField(max_length=255)
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -59,7 +59,7 @@ class Contestant(models.Model):
     last_name = models.CharField(max_length=255)
     gender = models.CharField(max_length=5, choices=GENDER_CHOICES)
     edu_level = models.CharField(max_length=3, choices=EDU_LEVEL_CHOICES, default='BSC')
-    student_number = models.CharField(max_length=255, default="")
+    student_number = models.CharField(max_length=255)
     email = models.CharField(max_length=255, unique=True)
     # phone_number = models.CharField(validators=[phone_regex], max_length=12, unique=True)
     phone_number = models.CharField(max_length=20, unique=True)
