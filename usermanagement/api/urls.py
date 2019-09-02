@@ -2,18 +2,17 @@ from django.urls import path
 
 from .views import (
     CountryListView,
-    TeamListView,
-    # TeamDetailView,
-    TeamCreateView,
-    OnlineContestantCreateView,
-    OnsiteContestantCreateView,
+    OnlineTeamListView,
+    OnsiteTeamListView,
+    OnlineTeamCreateView,
+    OnsiteTeamCreateView
 )
 
 urlpatterns = [
     path('countries', CountryListView.as_view()),
-    path('teams', TeamListView.as_view()),
-    # path('teams/<pk>', TeamDetailView.as_view()),
-    path('register/team/', TeamCreateView.as_view()),
-    path('register/contestant/online', OnlineContestantCreateView.as_view()),
-    path('register/contestant/onsite', OnsiteContestantCreateView.as_view()),
+    path('teams/online', OnlineTeamListView.as_view()),
+    path('teams/onsite', OnsiteTeamListView.as_view()),
+    path('register/team/onsite', OnsiteTeamCreateView.as_view()),
+    path('register/team/online', OnlineTeamCreateView.as_view())
+
 ]
