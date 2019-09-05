@@ -1,16 +1,17 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import (Contest, Gallery, Photo)
+from .models import (Contest, Gallery)
+# from photologue.models import Photo
 from photologue.admin import GalleryAdmin as RawGalleryAdmin
 from photologue.admin import PhotoAdmin as RawPhotoAdmin
 from django import forms
 
 class ContestAdmin(admin.ModelAdmin):
     # list_display_link = ('title', )
-    list_display = ('title','show_problem',
+    list_display = ('year','show_problem',
     'show_final_ranking_onsite' ,'show_final_ranking_online', )
     # list_filter = ('title',)
-    search_fields = [ 'title']
+    search_fields = ['year']
 
     def show_problem(self, obj):
         return format_html("<a href='{url}'>{text}</a>", url=obj.problems , text="problems")
@@ -32,7 +33,7 @@ class GalleryAdminForm(forms.ModelForm):
 
     class Meta:
         model = Gallery
-        exclude = ['description']
+        exclude = ['description', 'sites']
 
 
 class GalleryAdmin(RawGalleryAdmin):
@@ -41,12 +42,13 @@ class GalleryAdmin(RawGalleryAdmin):
 
 admin.site.register(Gallery, GalleryAdmin)
 
-class PhotoAdminForm(forms.ModelForm):
-    class Meta:
-        model = Photo
-        fields = '__all__'
+# class PhotoAdminForm(forms.ModelForm):
+#     class Meta:
+#         model = Photo
+#         fields = '__all__'
 
-class PhotoAdmin(RawPhotoAdmin):
-    form = PhotoAdminForm
+# class PhotoAdmin(RawPhotoAdmin):
+#     form = PhotoAdminForm
 
-admin.site.register(Photo, PhotoAdmin)
+# admin.site.unregister(Photo)
+# admin.site.register(Photo, PhotoAdmin)
