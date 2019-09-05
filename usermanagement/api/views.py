@@ -43,7 +43,6 @@ class OnsiteTeamCreateView(CreateAPIView):
     serializer_class = OnsiteTeamSerializer
 
 
-
 # class FullTeams
 # class OnlineContestantCreateView(CreateAPIView):
 #     queryset = OnlineContestant.objects.all()

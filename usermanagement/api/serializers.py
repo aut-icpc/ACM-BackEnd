@@ -30,6 +30,16 @@ class CountrySerializer(serializers.ModelSerializer):
         model = Country 
         fields = '__all__'
     
+
+def createContestants(validated_data, TeamType, ContstantType):
+    contestants_data = validated_data.pop('contestants')
+    team = TeamType.objects.create(**validated_data)
+    email = contestants_data[0]['email']
+    for contestant_data in contestants_data:
+        ContestantType.objects.create(team=team, **contestant_data)
+    return team, email
+
+
 class OnsiteTeamSerializer(serializers.ModelSerializer):
     contestants = OnsiteContestantSerializer(many=True)
     class Meta:
@@ -37,13 +47,9 @@ class OnsiteTeamSerializer(serializers.ModelSerializer):
         fields = team_fields
 
     def create(self, validated_data):
-        contestants_data = validated_data.pop('contestants')
-        team = OnsiteTeam.objects.create(**validated_data)
-        email = contestants_data[0]['email']
-        # print("email: " + email)
-        for contestant_data in contestants_data:
-            OnsiteContestant.objects.create(team=team, **contestant_data)
+        team, email = createContestants(validated_data, OnsiteTeam, OnsiteContestant)
         return team
+
 
 class OnlineTeamSerializer(serializers.ModelSerializer):
     contestants = OnlineContestantSerializer(many=True)
@@ -52,11 +58,7 @@ class OnlineTeamSerializer(serializers.ModelSerializer):
         fields = team_fields + ['country']
 
     def create(self, validated_data):
-        contestants_data = validated_data.pop('contestants')
-        team = OnlineTeam.objects.create(**validated_data)
-        email = contestants_data[0]['email']
-        for contestant_data in contestants_data:
-            OnlineContestant.objects.create(team=team, **contestant_data)
+        team, email = createContestants(validated_data, OnlineTeam, OnlineContestant)
         return team
 
 
