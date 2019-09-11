@@ -3,17 +3,16 @@ from contests.models import Gallery, Contest
 from photologue.models import Photo
 
 class GallerySerializer(serializers.ModelSerializer):
-    photos = serializers.SlugRelatedField(
-        many=True,
-        read_only=True,
-        slug_field='image'
-    )
+    photos = serializers.ReadOnlyField(source='photo_urls')
     class Meta:
         model = Gallery
-        fields = ['title', ]
+        fields = ['title', 'photos']
+    
+    # def get_photos(self, obj):
 
 
 class ContestSerializer(serializers.ModelSerializer):
+    
     class Meta:
         model = Contest
         fields = '__all__'
@@ -29,3 +28,4 @@ class PhotoSerializer(serializers.ModelSerializer):
 #         model = Photo
 #         fields = '__all__'
 
+# If 
