@@ -1,11 +1,9 @@
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
-from sorl.thumbnail import ImageField
-from sorl.thumbnail import get_thumbnail
-from sorl.thumbnail import delete
+from photologue.models import Gallery as RawGallery
+from photologue.models import Photo as RawPhoto
 
 
-class ACM (models.Model):
+class Contest (models.Model):
     title = models.CharField(max_length=500)
     problems = models.CharField(max_length=500) 
     final_ranking_onsite = models.CharField(max_length=500)
@@ -17,20 +15,19 @@ class ACM (models.Model):
     def __str__(self):
         return self.title
 
+    # class Meta:
+    #     # verbose_name = ''
+    #     # verbose_name_plural = ''    
+
+class Gallery(RawGallery):
+    # Photo title is the team name,
+    # Photo caption is the members' name.
+    contest = models.ForeignKey(Contest, on_delete=models.CASCADE)
+
     class Meta:
-        verbose_name = 'CONTEST'
-        verbose_name_plural = 'CONTESTS'    
+        verbose_name = 'Contest Gallery'
+        verbose_name_plural = 'Contest Galleries'
 
-class Image(models.Model):
-    # in alakie baad kelass mokhstam check konam
-    im = get_thumbnail(my_file, '300x400', crop='center', quality=99)
-    
-    # src = models.CharField(max_length = 500)
-    # thumbnail = models.CharField(max_length = 500)
-    # thumbnailheight = 300   
-    # thumbnailwidth = 400
-    contest = models.ForeignKey(ACM, blank=True, null=True , related_name="contest" , on_delete= models.CASCADE)
-    def __str__(self):
-        return self.src
-
-
+class Photo(RawPhoto):
+    pass
+    #For now
