@@ -3,8 +3,8 @@ from rest_framework.generics import (
     ListAPIView
 )
 
-from contests.models import Gallery, Contest
-from photologue.models import Photo
+from contests.models import Gallery, Contest, Photo
+# from photologue.models import Photo
 
 from .serializers import (
     GallerySerializer,
