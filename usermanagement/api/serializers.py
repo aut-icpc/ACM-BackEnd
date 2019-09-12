@@ -31,7 +31,7 @@ class CountrySerializer(serializers.ModelSerializer):
         fields = '__all__'
     
 
-def createContestants(validated_data, TeamType, ContstantType):
+def createContestants(validated_data, TeamType, ContestantType):
     contestants_data = validated_data.pop('contestants')
     team = TeamType.objects.create(**validated_data)
     email = contestants_data[0]['email']
@@ -74,8 +74,6 @@ class OnsiteTeamListSerializer(serializers.ModelSerializer):
         model = OnsiteTeam
         fields = '__all__'
     
-
-
 
     # def create(self, validated_data):
     #     team_name = validated_data.pop('team')
