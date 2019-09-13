@@ -12,6 +12,11 @@ from .serializers import (
     PhotoSerializer
 )
 
+
+class PhotoView(RetrieveAPIView):
+    queryset = Photo.objects.all()
+    serializer_class = PhotoSerializer
+    
 class GalleryRetrieveView(RetrieveAPIView):
     queryset = Gallery.objects.all()
     serializer_class = GallerySerializer
@@ -19,8 +24,3 @@ class GalleryRetrieveView(RetrieveAPIView):
 class ContestRetrieveView(RetrieveAPIView):
     queryset = Contest.objects.all()
     serializer_class = ContestSerializer
-
-class PhotoView(RetrieveAPIView):
-    queryset = Photo.objects.all()
-    serializer_class = PhotoSerializer
-    

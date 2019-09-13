@@ -4,8 +4,8 @@ from photologue.models import Photo as RawPhoto
 from photologue.models import PhotoSize
 from django.conf import settings
 
-class Contest (models.Model):
-    year = models.CharField(max_length=4, default="")
+class Contest(models.Model):
+    year = models.CharField(max_length=4)
     problems = models.CharField(max_length=500) 
     final_ranking_onsite = models.CharField(max_length=500)
     final_ranking_online = models.CharField(max_length=500)
@@ -23,14 +23,23 @@ class Photo(models.Model):
         verbose_name = 'Contest Photo'
 
     @property
-    def get_thumbnail_size(self):
-        ts = self.thumbnail_size
-        return ts.height, ts.width
+    def get_photo_src(self):
+        return settings.MEDIA_URL + self.photo.image.name
+
+    @property
+    def get_thumbnail_url(self):
+        # dont forget to add cache
+        if len(self.thumbnail_url) == 0:
+            file_name = self.get_photo_src
+            last_dot = file_name.rfind('.')
+            photo_name, photo_extension = file_name[:last_dot], file_name[last_dot:]
+            self.thumbnail_url = photo_name + '_' + self.thumbnail_size.name + photo_extension
+        
+        return self.thumbnail_url
+
 
 
 class Gallery(RawGallery):
-    # Photo title is the team name,
-    # Photo caption is the members' name.
     contest = models.ForeignKey(Contest, on_delete=models.CASCADE, related_name='gallery')    
 
     class Meta:
@@ -39,14 +48,3 @@ class Gallery(RawGallery):
 
     def __str__(self):
         return 'ACM ' + self.contest.year + ' ' + self.title
-
-    @property
-    def get_photos(self):
-        images = []
-        urls = []
-        for photo in RawPhoto.objects.filter(galleries=self.pk):
-            images.append({
-                "src": settings.MEDIA_URL + photo.image.name
-            })
-            # urls += [settings.MEDIA_URL + photo.image.name]
-        return urls
