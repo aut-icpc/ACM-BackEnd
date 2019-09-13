@@ -19,9 +19,7 @@ class GallerySerializer(serializers.ModelSerializer):
         model = Gallery
         fields = ['title', 'photos']
         depth = 1
-
-
-    
+        
 
 class ContestSerializer(serializers.ModelSerializer):
     gallery = GallerySerializer(many=True)
