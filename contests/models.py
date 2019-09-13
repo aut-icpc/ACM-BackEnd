@@ -38,7 +38,6 @@ class Photo(models.Model):
         return self.thumbnail_url
 
 
-
 class Gallery(RawGallery):
     contest = models.ForeignKey(Contest, on_delete=models.CASCADE, related_name='gallery')    
 

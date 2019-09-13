@@ -3,9 +3,9 @@ from django.utils.html import format_html
 from .models import Contest, Gallery, Photo 
 from photologue.admin import GalleryAdmin as RawGalleryAdmin, PhotoAdmin as RawPhotoAdmin, PhotoAdminForm as RawPhotoAdminForm
 from photologue.models import Photo as RawPhoto, PhotoSize
+from django import forms
 from photologue.forms import UploadZipForm as RawUploadZipForm
 from django.http import HttpResponseRedirect
-from django import forms
 from django.utils.translation import ungettext, ugettext_lazy as _
 from django.contrib.admin import helpers
 from django.shortcuts import render
@@ -60,17 +60,11 @@ class PhotoInline(admin.StackedInline):
     can_delete = False
     exclude = ['thumbnail_url']
 
-class GalleryInline(admin.StackedInline):
-    model = Gallery
-    can_delete = False
 
 class UploadZipForm(RawUploadZipForm):
     thumbnail_size = forms.ModelChoiceField(PhotoSize.objects.all(),
                                      label=_('PhotoSize'),
                                      required=True)
-
-
-#TODO: add thumbnail_size to zip mode!!
 
 class PhotoAdmin(RawPhotoAdmin):
     inlines = [PhotoInline, ]
@@ -99,21 +93,3 @@ class PhotoAdmin(RawPhotoAdmin):
         return render(request, 'admin/photologue/photo/upload_zip.html', context)
 
 admin.site.register(RawPhoto, PhotoAdmin)
-
-
-# class PhotoAdminForm(RawPhotoAdminForm):
-#     class Meta:
-#         model = Photo
-#         fields = '__all__'
-
-# class PhotoAdmin(RawPhotoAdmin):
-#     form = PhotoAdminForm
-
-    # def upload_zip(self, request):
-    #     return self.super().upload_zip(self, request)
-
-    # def get_urls(self):
-    #     return self.super().get_urls()
-
-# admin.site.unregister(Photo)
-# admin.site.register(Photo, PhotoAdmin)
