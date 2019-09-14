@@ -1,9 +1,10 @@
 from rest_framework import serializers
 from contests.models import Gallery, Contest, Photo
 
-class PhotoSerializer(serializers.HyperlinkedModelSerializer):
-    thumbnail_height = serializers.ReadOnlyField(source='thumbnail_size.height')
-    thumbnail_width = serializers.ReadOnlyField(source='thumbnail_size.width')
+class PhotoSerializer(serializers.ModelSerializer):
+    thumbnail_size = serializers.ListField(read_only=True, source='get_thumbnail_size')
+    # thumbnail_height = serializers.ReadOnlyField(source='thumbnail_size.height')
+    # thumbnail_width = serializers.ReadOnlyField(source='thumbnail_size.width')
     src = serializers.ReadOnlyField(source='get_photo_src')
     thumbnail_url = serializers.ReadOnlyField(source='get_thumbnail_url')
     caption = serializers.ReadOnlyField(source='photo.caption')
@@ -13,19 +14,19 @@ class PhotoSerializer(serializers.HyperlinkedModelSerializer):
 
 
 class GallerySerializer(serializers.ModelSerializer):
-    # photos = PhotoSerializer(many=True)
-    photos = serializers.ListField(read_only=True, child=PhotoSerializer())
+    photos = PhotoSerializer(many=True)
     class Meta:
         model = Gallery
         fields = ['title', 'photos']
-        depth = 1
-        
+
+   
+
 
 class ContestSerializer(serializers.ModelSerializer):
-    gallery = GallerySerializer(many=True)
+    # gallery = GallerySerializer(many=True)
     class Meta:
         model = Contest
-        fields = ['year', 'problems', 'final_ranking_onsite', 'final_ranking_online', 'gallery']
+        fields = ['year', 'problems', 'final_ranking_onsite', 'final_ranking_online']
 
 
 

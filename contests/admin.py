@@ -1,14 +1,11 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from .models import Contest, Gallery, Photo 
+from photologue.models import Photo as RawPhoto
 from photologue.admin import GalleryAdmin as RawGalleryAdmin, PhotoAdmin as RawPhotoAdmin, PhotoAdminForm as RawPhotoAdminForm
-from photologue.models import Photo as RawPhoto, PhotoSize
 from django import forms
-from photologue.forms import UploadZipForm as RawUploadZipForm
-from django.http import HttpResponseRedirect
-from django.utils.translation import ungettext, ugettext_lazy as _
-from django.contrib.admin import helpers
-from django.shortcuts import render
+from .photologue_override import PhotoAdmin
+
 
 
 def unregister_photologue():
@@ -55,41 +52,24 @@ class GalleryAdmin(RawGalleryAdmin):
 admin.site.register(Gallery, GalleryAdmin)
 
 
-class PhotoInline(admin.StackedInline):
-    model = Photo
-    can_delete = False
-    exclude = ['thumbnail_url']
+# class PhotoInline(admin.StackedInline):
+#     model = Photo
+#     can_delete = False
+#     exclude = ['thumbnail_url']
 
 
-class UploadZipForm(RawUploadZipForm):
-    thumbnail_size = forms.ModelChoiceField(PhotoSize.objects.all(),
-                                     label=_('PhotoSize'),
-                                     required=True)
 
-class PhotoAdmin(RawPhotoAdmin):
-    inlines = [PhotoInline, ]
+admin.site.register(Photo, PhotoAdmin)
 
-    def upload_zip(self, request):
 
-        context = {
-            'title': _('Upload a zip archive of photos'),
-            'app_label': self.model._meta.app_label,
-            'opts': self.model._meta,
-            'has_change_permission': self.has_change_permission(request)
-        }
+# def get_form(self, request, obj=None, **kwargs):
+    #     form = super(PhotoAdmin, self).get_form(request, obj, **kwargs)
+    #     # form.base_fields['thumbnail_url'].initial = 
 
-        # Handle form request
-        if request.method == 'POST':
-            form = UploadZipForm(request.POST, request.FILES)
-            if form.is_valid():
-                form.save(request=request)
-                return HttpResponseRedirect('..')
-        else:
-            form = UploadZipForm()
-        context['form'] = form
-        context['adminform'] = helpers.AdminForm(form,
-                                                 list([(None, {'fields': form.base_fields})]),
-                                                 {})
-        return render(request, 'admin/photologue/photo/upload_zip.html', context)
+    # inlines = [PhotoInline, ]
+    # prepopulated_fields.update({
+    #     'thumbnail_url'
+    # })
 
-admin.site.register(RawPhoto, PhotoAdmin)
+    # model = Photo
+    # exclude = ['thumbnail_url']
