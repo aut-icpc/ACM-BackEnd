@@ -23,4 +23,14 @@ class GalleryRetrieveView(RetrieveAPIView):
 
 class ContestRetrieveView(RetrieveAPIView):
     queryset = Contest.objects.all()
+    serializer_class = PhotoSerializer
+
+    # def get_queryset(self):
+    #     year = self.kwargs['year']
+    #     photos = 
+    #     galleries = Gallery.objects.filter(contest__year=year).value_list('photos', flat=True)
+
+
+class ContestListView(ListAPIView):
+    queryset = Contest.objects.all()
     serializer_class = ContestSerializer
