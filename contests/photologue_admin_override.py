@@ -6,7 +6,7 @@ from django.shortcuts import render
 from django.conf.urls import url
 from django import forms
 from photologue.models import Photo as RawPhoto, PhotoSize
-from photologue.admin import GalleryAdmin as RawGalleryAdmin, PhotoAdmin as RawPhotoAdmin
+from photologue.admin import GalleryAdmin as RawGalleryAdmin, PhotoAdmin as RawPhotoAdmin, PhotoAdminForm as RawPhotoAdminForm
 import logging
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -15,11 +15,14 @@ from PIL import Image
 import zipfile
 from zipfile import BadZipFile
 from django.template.defaultfilters import slugify
-from .models import Photo, Gallery
 from django.contrib import messages
 from django.utils.encoding import force_text
 from django.core.files.base import ContentFile
 import os
+import uuid
+
+from .models import Gallery
+from .photologue_model_override import Photo
 
 
 
@@ -42,6 +45,8 @@ class UploadZipForm(RawUploadZipForm):
         else:
             logger.debug(
                 force_text('Creating new gallery "{0}".').format(self.cleaned_data['title']))
+                
+            #Changed gallery to extendedGallery
             gallery = Gallery.objects.create(title=self.cleaned_data['title'],
                                              slug=slugify(self.cleaned_data['title']),
                                              description=self.cleaned_data['description'],
@@ -66,7 +71,7 @@ class UploadZipForm(RawUploadZipForm):
                 continue
 
             data = zip.read(filename)
-
+            # print(data.__class__)
             if not len(data):
                 logger.debug('File "{0}" is empty.'.format(filename))
                 continue
@@ -123,7 +128,80 @@ class UploadZipForm(RawUploadZipForm):
                              fail_silently=True)
 
 
+# def random_string(string_length):
+#     random = str(uuid.uuid4())
+#     random.replace("-", "")
+#     return random[:string_length]
+
+
+class PhotoAdminForm(RawPhotoAdminForm):
+    gallery = forms.ModelChoiceField(Gallery.objects.all(),
+                                     label=_('Gallery'),
+                                     required=True)
+    class Meta:
+        model = Photo
+        fields = '__all__'
+
+    def save_m2m(self):
+        return super()._save_m2m()
+
+    def save(self, commit=False):
+        count = 1
+
+        if self.cleaned_data['gallery']:
+            logger.debug('Using pre-existing gallery.')
+            gallery = self.cleaned_data['gallery']
+        else:
+            logger.debug(
+                force_text('Creating new gallery "{0}".').format(self.cleaned_data['title']))
+            gallery = Gallery.objects.create(title=self.cleaned_data['title'],
+                                             slug=slugify(self.cleaned_data['title']),
+                                             description=self.cleaned_data['description'],
+                                             is_public=self.cleaned_data['is_public'])
+        image = self.cleaned_data['image']
+        filename = image.name
+        
+        # with open(filename, 'rb') as f:
+        #     data = f.read()
+        photo_title_root = self.cleaned_data['title'] if self.cleaned_data['title'] else gallery.title
+        # A photo might already exist with the same slug. So it's somewhat inefficient,
+        # but we loop until we find a slug that's available.
+        while True:
+            photo_title = ' '.join([photo_title_root, str(count)])
+            slug = slugify(photo_title)
+            if Photo.objects.filter(slug=slug).exists():
+                count += 1
+                continue
+            break
+        slug = slugify(photo_title)
+        photo = Photo(title=photo_title,
+                          slug=slug,
+                          caption=self.cleaned_data['caption'],
+                          is_public=self.cleaned_data['is_public'],
+                          thumbnail_size=self.cleaned_data['thumbnail_size'])
+        print("inja")
+        photo.image.save(filename, image.file)
+        print("oonja")
+        photo.save()
+        print("then wtf")
+        gallery.photos.add(photo)
+        return photo
+
+
+
+
+
 class PhotoAdmin(RawPhotoAdmin):
+
+    # list_display += ('gallery',)
+    form = PhotoAdminForm
+    exclude = ['thumbnail_url', 'sites']
+
+    # def get_fieldsets(self, request, obj=None):
+    #     fieldsets = super(PhotoAdmin, self).get_fieldsets(request, obj)
+    #     # fieldsets[0][1]['fields'] += ['galleries']
+    #     print(fieldsets)
+    #     return fieldsets
 
     def get_urls(self):
         urls = super(PhotoAdmin, self).get_urls()

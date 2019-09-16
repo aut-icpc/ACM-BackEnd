@@ -3,14 +3,12 @@ from contests.models import Gallery, Contest, Photo
 
 class PhotoSerializer(serializers.ModelSerializer):
     thumbnail_size = serializers.ListField(read_only=True, source='get_thumbnail_size')
-    # thumbnail_height = serializers.ReadOnlyField(source='thumbnail_size.height')
-    # thumbnail_width = serializers.ReadOnlyField(source='thumbnail_size.width')
     src = serializers.ReadOnlyField(source='get_photo_src')
     thumbnail_url = serializers.ReadOnlyField(source='get_thumbnail_url')
     caption = serializers.ReadOnlyField(source='photo.caption')
     class Meta:
         model = Photo
-        fields = ['src', 'thumbnail_url', 'thumbnail_height', 'thumbnail_width', 'caption']
+        fields = ['src', 'thumbnail_url', 'thumbnail_size', 'caption']
 
 
 class GallerySerializer(serializers.ModelSerializer):
@@ -20,7 +18,6 @@ class GallerySerializer(serializers.ModelSerializer):
         fields = ['title', 'photos']
 
    
-
 
 class ContestSerializer(serializers.ModelSerializer):
     # gallery = GallerySerializer(many=True)

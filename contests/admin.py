@@ -1,11 +1,10 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Contest, Gallery, Photo 
+from .models import Contest, Gallery, Photo, CurrentContest
 from photologue.models import Photo as RawPhoto
 from photologue.admin import GalleryAdmin as RawGalleryAdmin, PhotoAdmin as RawPhotoAdmin, PhotoAdminForm as RawPhotoAdminForm
 from django import forms
-from .photologue_override import PhotoAdmin
-
+from .photologue_admin_override import PhotoAdmin
 
 
 def unregister_photologue():
@@ -17,6 +16,8 @@ def unregister_photologue():
     admin.site.unregister(Watermark)
 
 unregister_photologue()
+
+admin.site.register(Photo, PhotoAdmin)
 
 class ContestAdmin(admin.ModelAdmin):
     list_display = ('year','show_problem',
@@ -52,14 +53,14 @@ class GalleryAdmin(RawGalleryAdmin):
 admin.site.register(Gallery, GalleryAdmin)
 
 
+admin.site.register(CurrentContest)
+
+
+
 # class PhotoInline(admin.StackedInline):
 #     model = Photo
 #     can_delete = False
 #     exclude = ['thumbnail_url']
-
-
-
-admin.site.register(Photo, PhotoAdmin)
 
 
 # def get_form(self, request, obj=None, **kwargs):
