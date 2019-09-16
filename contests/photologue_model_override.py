@@ -13,9 +13,10 @@ class Photo(RawPhoto):
     # photo = models.OneToOneField(RawPhoto, related_name='contest_photo', on_delete=models.CASCADE)
     thumbnail_size = models.ForeignKey(PhotoSize, related_name='contest_photo', on_delete=models.DO_NOTHING)
     thumbnail_url = models.TextField(verbose_name='thumbnail_url')
+    src = models.TextField(verbose_name='src')
+
 
     thumbnail_urls = OrderedDict()
-
 
     class Meta:
         verbose_name = 'Contest Photo'
@@ -27,10 +28,14 @@ class Photo(RawPhoto):
     
     @property
     def get_photo_src(self):
-        return settings.MEDIA_URL + self.image.name
+        print("oomad inja")
+        if len(self.src) == 0:
+            self.src = settings.MEDIA_URL + self.image.name
+        return self.src
 
     @property
     def get_thumbnail_url(self):
+        print("inja ham oomad")
         if len(self.thumbnail_url) == 0:
             self.thumbnail_url = self.thumbnail_urls[self.thumbnail_size.name]
             
