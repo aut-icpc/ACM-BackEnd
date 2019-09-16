@@ -20,10 +20,10 @@ from django.utils.encoding import force_text
 from django.core.files.base import ContentFile
 import os
 import uuid
+from django.urls import path
 
 from .models import Gallery
 from .photologue_model_override import Photo
-
 
 
 logger = logging.getLogger('photologueOverride.forms')
@@ -128,12 +128,6 @@ class UploadZipForm(RawUploadZipForm):
                              fail_silently=True)
 
 
-# def random_string(string_length):
-#     random = str(uuid.uuid4())
-#     random.replace("-", "")
-#     return random[:string_length]
-
-
 class PhotoAdminForm(RawPhotoAdminForm):
     gallery = forms.ModelChoiceField(Gallery.objects.all(),
                                      label=_('Gallery'),
@@ -179,29 +173,18 @@ class PhotoAdminForm(RawPhotoAdminForm):
                           caption=self.cleaned_data['caption'],
                           is_public=self.cleaned_data['is_public'],
                           thumbnail_size=self.cleaned_data['thumbnail_size'])
-        print("inja")
+        
         photo.image.save(filename, image.file)
-        print("oonja")
         photo.save()
-        print("then wtf")
         gallery.photos.add(photo)
         return photo
 
 
-
-
-
 class PhotoAdmin(RawPhotoAdmin):
 
-    # list_display += ('gallery',)
     form = PhotoAdminForm
-    exclude = ['thumbnail_url', 'sites']
+    exclude = ['thumbnail_url', 'sites', 'src']
 
-    # def get_fieldsets(self, request, obj=None):
-    #     fieldsets = super(PhotoAdmin, self).get_fieldsets(request, obj)
-    #     # fieldsets[0][1]['fields'] += ['galleries']
-    #     print(fieldsets)
-    #     return fieldsets
 
     def get_urls(self):
         urls = super(PhotoAdmin, self).get_urls()

@@ -54,7 +54,7 @@ admin.site.register(Gallery, GalleryAdmin)
 
 
 admin.site.register(CurrentContest)
-
+# admin.site.register(RawPhoto)
 
 
 # class PhotoInline(admin.StackedInline):
