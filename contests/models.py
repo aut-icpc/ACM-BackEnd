@@ -1,10 +1,8 @@
 from django.db import models
-from photologue.models import Gallery as RawGallery
-from photologue.models import Photo as RawPhoto
-from photologue.models import PhotoSize
+from photologue.models import Gallery as RawGallery, Photo as RawPhoto, PhotoSizeCache, PhotoSize
 from django.conf import settings
-# from django.db.models.signals import pre_save
-# from django.dispatch import receiver
+from .photologue_model_override import Photo
+
 
 class Contest(models.Model):
     year = models.CharField(max_length=4)
@@ -15,46 +13,19 @@ class Contest(models.Model):
     def __str__(self):
         return 'ACM ' + str(self.year)
 
+# Makes the more recent contest the main one in case the main one is deleted.
+# An alternative Approach is commented to prohibit admin from deleting the main contest, having to change it to another one first.
 
-class Photo(RawPhoto):
-    # photo = models.OneToOneField(RawPhoto, related_name='contest_photo', on_delete=models.CASCADE)
-    thumbnail_size = models.ForeignKey(PhotoSize, related_name='contest_photo', on_delete=models.DO_NOTHING)
-    thumbnail_url = models.TextField(verbose_name='thumbnail_url')
+def get_latest_contest():
+    return Contest.objects().latest('year')
+
+class CurrentContest(models.Model):
+    main = models.ForeignKey(Contest, 
+        on_delete=models.SET('get_latest_contest'))
+      # on_delete=models.PROTECT()
 
     class Meta:
-        verbose_name = 'Contest Photo'
-
-    @property
-    def get_thumbnail_size(self):
-        ts = self.thumbnail_size
-        return [ts.height, ts.width]
-    
-    @property
-    def get_photo_src(self):
-        return settings.MEDIA_URL + self.image.name
-
-    @property
-    def get_thumbnail_url(self):
-        # dont forget to add cache
-        if len(self.thumbnail_url) == 0:
-            file_name = self.get_photo_src
-            print(file_name)
-            last_dot = file_name.rfind('.')
-            photo_name, photo_extension = file_name[:last_dot], file_name[last_dot:]
-            self.thumbnail_url = photo_name + '_' + self.thumbnail_size.name + photo_extension
-            
-        return self.thumbnail_url
-    
-    # def save(self, *args, **kwargs):
-
-    # def generate_thumbnail_url(sender, **kwargs):
-    #     kwargs.get('instance').thumbnail_url = self.get_thumbnail_url()
-    #     return 
-
-# @receiver(pre_save, sender=Photo, dispatch_uid="add_thumbnail_url")
-# def add_thumbnail_url(sender, instance, **kwargs):
-#     instance.get_thumbnail_url()
-
+        verbose_name_plural = 'Current Contest'
 
 
 class Gallery(RawGallery):
@@ -66,3 +37,11 @@ class Gallery(RawGallery):
 
     def __str__(self):
         return 'ACM ' + self.contest.year + ' ' + self.title
+
+
+# from django.db.models.signals import pre_save
+# from django.dispatch import receiver
+# @receiver(pre_save, sender=Photo, dispatch_uid="add_thumbnail_url")
+# def add_thumbnail_url(sender, instance, **kwargs):
+#     instance.get_thumbnail_url()
+
