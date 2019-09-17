@@ -1,10 +1,13 @@
 from django.urls import path
+
 from .views import (
-    ACMTitleistView, ACMRetriveView
+    GalleryRetrieveView,
+    ContestRetrieveView,
+    PhotoView
 )
 
-urlpatterns =[
-
-     path("<pk>",ACMRetriveView.as_view(), name='ACMRET'),
-     path("", ACMTitleistView.as_view(), name ='ACMTIT'),
+urlpatterns = [
+    path('galleries/<pk>', GalleryRetrieveView.as_view()),
+    path('contests/<pk>', ContestRetrieveView.as_view()),
+    path('photos/<pk>', PhotoView.as_view())
 ]

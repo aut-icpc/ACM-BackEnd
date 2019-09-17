@@ -1,22 +1,26 @@
-from django.shortcuts import render
-from django.http import JsonResponse
-from ..models import ACM
-from ..api import serializers
-from rest_framework.generics import ListAPIView,RetrieveAPIView
+from rest_framework.generics import (
+    RetrieveAPIView,
+    ListAPIView
+)
 
-# def ACMAPI(request):
-#     contest = ACM.objects.all()
-#     return JsonResponse(serializers.ACMSerializer(contest, many = True).data, safe = False)
-      
-      
-#         # return JsonResponse(MovieSerializer(movies, many=True).data, safe=False)
+from contests.models import Gallery, Contest
+from photologue.models import Photo
 
+from .serializers import (
+    GallerySerializer,
+    ContestSerializer,
+    PhotoSerializer
+)
 
-class ACMTitleistView(ListAPIView):
-    queryset = ACM.objects.all()
-    serializer_class = serializers.ACMTitleSerializer
+class GalleryRetrieveView(RetrieveAPIView):
+    queryset = Gallery.objects.all()
+    serializer_class = GallerySerializer
 
+class ContestRetrieveView(RetrieveAPIView):
+    queryset = Contest.objects.all()
+    serializer_class = ContestSerializer
 
-class ACMRetriveView(RetrieveAPIView):
-    queryset = ACM.objects.all()
-    serializer_class = serializers.ACMSerializer
+class PhotoView(RetrieveAPIView):
+    queryset = Photo.objects.all()
+    serializer_class = PhotoSerializer
+    
