@@ -6,11 +6,12 @@ from PIL import Image
 from django.core.files.base import ContentFile
 from pathlib import Path
 from collections import OrderedDict
-
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+import traceback
 
 
 class Photo(RawPhoto):
-    # photo = models.OneToOneField(RawPhoto, related_name='contest_photo', on_delete=models.CASCADE)
     thumbnail_size = models.ForeignKey(PhotoSize, related_name='contest_photo', on_delete=models.DO_NOTHING)
     thumbnail_url = models.TextField(verbose_name='thumbnail_url')
     src = models.TextField(verbose_name='src')
@@ -26,33 +27,33 @@ class Photo(RawPhoto):
         ts = self.thumbnail_size
         return [ts.height, ts.width]
     
-    @property
-    def get_photo_src(self):
-        print("oomad inja")
+    def set_photo_src(self):
         if len(self.src) == 0:
             self.src = settings.MEDIA_URL + self.image.name
         return self.src
 
-    @property
-    def get_thumbnail_url(self):
-        print("inja ham oomad")
+    def set_thumbnail_url(self):
+        print(self.thumbnail_urls)
         if len(self.thumbnail_url) == 0:
             self.thumbnail_url = self.thumbnail_urls[self.thumbnail_size.name]
             
         return self.thumbnail_url
+
     
     def pre_cache(self):
-        cache = PhotoSizeCache()
-        for photosize in cache.sizes.values():
-            if photosize.pre_cache:
-                photosize_url = self.create_size(photosize)
-                # Create serializable address
-                photosize_dir = str(photosize_url)
-                # Windows compatibility in debug mode.
-                photosize_win_dir = photosize_dir.replace("\\", "/")
+
+        photosize = self.thumbnail_size
+        if photosize.pre_cache:
+            photosize_url = self.create_size(photosize)
+            # Create serializable address
+            photosize_dir = str(photosize_url)
+            # Windows compatibility in debug mode.
+            photosize_win_dir = photosize_dir.replace("\\", "/")
+            if photosize.name not in self.thumbnail_urls.keys():
                 self.thumbnail_urls.update({
                     photosize.name: settings.MEDIA_URL + photosize_win_dir
                 })
+        
     
 
     def create_size(self, photosize):
@@ -106,8 +107,11 @@ class Photo(RawPhoto):
         # This returns the thumbnail's url
         return Path(im_filename)
 
-    # def save(self, *args, **kwargs):
-    #     print("OOOOOOOOOOOOOOMADEEEEEEEEE INJAAAAAAAA")
-    #     print(*args)
-    #     print(**kwargs)
-    #     super().save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        self.validate_unique()
+        super(Photo, self).save(*args, **kwargs)  
+
+
+# @receiver(post_save, sender=Photo, dispatch_uid="add_photo_src")
+# def add_photo_src(sender, instance, **kwargs):
+#     instance.set_photo_src()

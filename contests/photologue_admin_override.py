@@ -21,9 +21,19 @@ from django.core.files.base import ContentFile
 import os
 import uuid
 from django.urls import path
+# import traceback
 
 from .models import Gallery
 from .photologue_model_override import Photo
+
+def save_photo(filename, contentfile, photo, gallery):
+    current_site = Site.objects.get(id=settings.SITE_ID)
+    photo.image.save(filename, contentfile)
+    photo.save()
+    photo.set_photo_src()
+    photo.set_thumbnail_url()
+    photo.sites.add(current_site)
+    gallery.photos.add(photo)
 
 
 logger = logging.getLogger('photologueOverride.forms')
@@ -71,7 +81,6 @@ class UploadZipForm(RawUploadZipForm):
                 continue
 
             data = zip.read(filename)
-            # print(data.__class__)
             if not len(data):
                 logger.debug('File "{0}" is empty.'.format(filename))
                 continue
@@ -113,10 +122,7 @@ class UploadZipForm(RawUploadZipForm):
                 continue
 
             contentfile = ContentFile(data)
-            photo.image.save(filename, contentfile)
-            photo.save()
-            photo.sites.add(current_site)
-            gallery.photos.add(photo)
+            save_photo(filename, contentfile, photo, gallery)
             count += 1
 
         zip.close()
@@ -140,7 +146,6 @@ class PhotoAdminForm(RawPhotoAdminForm):
         return super()._save_m2m()
 
     def save(self, commit=False):
-        count = 1
 
         if self.cleaned_data['gallery']:
             logger.debug('Using pre-existing gallery.')
@@ -155,18 +160,8 @@ class PhotoAdminForm(RawPhotoAdminForm):
         image = self.cleaned_data['image']
         filename = image.name
         
-        # with open(filename, 'rb') as f:
-        #     data = f.read()
-        photo_title_root = self.cleaned_data['title'] if self.cleaned_data['title'] else gallery.title
-        # A photo might already exist with the same slug. So it's somewhat inefficient,
-        # but we loop until we find a slug that's available.
-        while True:
-            photo_title = ' '.join([photo_title_root, str(count)])
-            slug = slugify(photo_title)
-            if Photo.objects.filter(slug=slug).exists():
-                count += 1
-                continue
-            break
+        photo_title = self.cleaned_data['title'] if self.cleaned_data['title'] else gallery.title
+
         slug = slugify(photo_title)
         photo = Photo(title=photo_title,
                           slug=slug,
@@ -174,9 +169,7 @@ class PhotoAdminForm(RawPhotoAdminForm):
                           is_public=self.cleaned_data['is_public'],
                           thumbnail_size=self.cleaned_data['thumbnail_size'])
         
-        photo.image.save(filename, image.file)
-        photo.save()
-        gallery.photos.add(photo)
+        save_photo(filename, image.file, photo, gallery)
         return photo
 
 
@@ -184,7 +177,6 @@ class PhotoAdmin(RawPhotoAdmin):
 
     form = PhotoAdminForm
     exclude = ['thumbnail_url', 'sites', 'src']
-
 
     def get_urls(self):
         urls = super(PhotoAdmin, self).get_urls()
