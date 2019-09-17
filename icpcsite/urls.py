@@ -25,7 +25,5 @@ urlpatterns = [
     path('api/', include('mainsite.api.urls')),
     path('api/', include('usermanagement.api.urls')),
     path('api/', include('contests.api.urls')),
-    path(r'contests/', include('contests.urls')),
-    # path(r'photologue/', include('photologue.urls')),
-    # path(r'photologue/photo/add/', CreateView.as_view(model=Photo), name='add-photo'),
+    
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

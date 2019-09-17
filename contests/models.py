@@ -20,9 +20,7 @@ def get_latest_contest():
     return Contest.objects().latest('year')
 
 class CurrentContest(models.Model):
-    main = models.ForeignKey(Contest, 
-        on_delete=models.SET('get_latest_contest'))
-      # on_delete=models.PROTECT()
+    main = models.ForeignKey(Contest, on_delete=models.SET('get_latest_contest'))
 
     class Meta:
         verbose_name_plural = 'Current Contest'
@@ -39,9 +37,5 @@ class Gallery(RawGallery):
         return 'ACM ' + self.contest.year + ' ' + self.title
 
 
-# from django.db.models.signals import pre_save
-# from django.dispatch import receiver
-# @receiver(pre_save, sender=Photo, dispatch_uid="add_thumbnail_url")
-# def add_thumbnail_url(sender, instance, **kwargs):
-#     instance.get_thumbnail_url()
+
 

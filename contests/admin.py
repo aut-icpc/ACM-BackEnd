@@ -54,23 +54,3 @@ admin.site.register(Gallery, GalleryAdmin)
 
 
 admin.site.register(CurrentContest)
-# admin.site.register(RawPhoto)
-
-
-# class PhotoInline(admin.StackedInline):
-#     model = Photo
-#     can_delete = False
-#     exclude = ['thumbnail_url']
-
-
-# def get_form(self, request, obj=None, **kwargs):
-    #     form = super(PhotoAdmin, self).get_form(request, obj, **kwargs)
-    #     # form.base_fields['thumbnail_url'].initial = 
-
-    # inlines = [PhotoInline, ]
-    # prepopulated_fields.update({
-    #     'thumbnail_url'
-    # })
-
-    # model = Photo
-    # exclude = ['thumbnail_url']
