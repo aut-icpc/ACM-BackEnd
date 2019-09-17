@@ -15,9 +15,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from photologue.models import Photo
+from django.views.generic import CreateView
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('mainsite.api.urls')),
-    path('api/', include('usermanagement.api.urls'))
-]
+    path('api/', include('usermanagement.api.urls')),
+    path('api/', include('contests.api.urls')),
+    path(r'photologue/', include('photologue.urls')),
+    # path(r'photologue/photo/add/', CreateView.as_view(model=Photo), name='add-photo'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

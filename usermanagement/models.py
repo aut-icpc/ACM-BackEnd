@@ -25,12 +25,16 @@ T_SHIRT_SIZE_CHOICES = (
 )
 
 TEAM_STATUS_CHOICES = (
-    ('PENDING', 'Pending Payment'),
-    ('PAID', 'Paid'),
+    ('PENDING', 'Pending'),
     ('APPROVED', 'Approved for participation'),
-    ('REJECTED', 'Denied Participation'),
-    ('RESERVED', 'Reserved registration beforehand')
+    ('REJECTED', 'Denied Participation')
 )
+
+ONSITE_TEAM_STATUS_CHOICES = (
+    ('PAID', 'Paid'),
+    ('RESERVED', 'Reserved registration beforehand') ) + TEAM_STATUS_CHOICES
+
+ONLINE_TEAM_STATUS_CHOICES = () + TEAM_STATUS_CHOICES
 
 class Country(models.Model):
     name = models.CharField(max_length=255)
@@ -43,31 +47,30 @@ class Country(models.Model):
 
 class Team(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    is_onsite = models.BooleanField(default=False)
-    status = models.CharField(max_length=50, choices=TEAM_STATUS_CHOICES, default='PENDING')
     institution = models.CharField(max_length=255)
-    country = models.ForeignKey(Country, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.name
 
+class OnlineTeam(Team):
+    country = models.ForeignKey(Country, on_delete=models.CASCADE)
+    status = models.CharField(max_length=50, choices=ONLINE_TEAM_STATUS_CHOICES, default='PENDING')
+
+class OnsiteTeam(Team):
+    status = models.CharField(max_length=50, choices=ONSITE_TEAM_STATUS_CHOICES, default="PENDING")
+
 
 class Contestant(models.Model):
-    # phone_regex = RegexValidator(regex="09[0-9]{9}", message="Phone number must be entered correctly.")
-
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     gender = models.CharField(max_length=5, choices=GENDER_CHOICES)
     edu_level = models.CharField(max_length=3, choices=EDU_LEVEL_CHOICES, default='BSC')
     student_number = models.CharField(max_length=255)
     email = models.CharField(max_length=255, unique=True)
-    # phone_number = models.CharField(validators=[phone_regex], max_length=12, unique=True)
     phone_number = models.CharField(max_length=20, unique=True)
 
-    team = models.ForeignKey(Team, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='contestants')
 
-    # class Meta:
-    #     unique_together = ["email", "phone_number"]
 
     def __str__(self):
         return self.first_name + " " + self.last_name
