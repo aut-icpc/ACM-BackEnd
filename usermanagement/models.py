@@ -63,7 +63,6 @@ class OnlineTeam(Team):
 
 
 class MailMessage(models.Model):
-    # contest = models.OneToOneField()
     paid = models.TextField(default='Paid')
     reserved = models.TextField(default="Reserved registration beforehand")
     pending = models.TextField(default="Pending")

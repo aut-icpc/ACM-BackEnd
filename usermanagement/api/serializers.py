@@ -47,11 +47,11 @@ class OnsiteTeamSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OnsiteTeam
-        fields = team_fields   
+        fields = team_fields
 
     def create(self, validated_data):
         team, email = createContestants(validated_data, OnsiteTeam, OnsiteContestant)
-        send_mail( team.name, email, 'Create Onsite Contestant')
+        send_mail(team.name, email, 'Create Onsite Contestant')
         return team
 
 

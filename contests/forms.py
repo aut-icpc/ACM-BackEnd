@@ -1,30 +1,24 @@
-from photologue.forms import UploadZipForm as RawUploadZipForm
-from django.http import HttpResponseRedirect
-from django.utils.translation import ungettext, ugettext_lazy as _
-from django.contrib.admin import helpers
-from django.shortcuts import render
-from django.conf.urls import url
-from django import forms
+
 from photologue.models import PhotoSize
-from photologue.admin import GalleryAdmin as RawGalleryAdmin, PhotoAdmin as RawPhotoAdmin, PhotoAdminForm as RawPhotoAdminForm
-import logging
-from django.conf import settings
-from django.contrib.sites.models import Site
-from io import BytesIO
-from PIL import Image
+from photologue.forms import UploadZipForm as RawUploadZipForm
+from photologue.admin import PhotoAdminForm as RawPhotoAdminForm
 import zipfile
 from zipfile import BadZipFile
-from django.template.defaultfilters import slugify
-from django.contrib import messages
-from django.utils.encoding import force_text
+import logging
+from .models import Gallery, Photo
+from PIL import Image
+from io import BytesIO
+from django.conf import settings
+from django.utils.translation import ungettext, ugettext_lazy as _
 from django.core.files.base import ContentFile
+from django.template.defaultfilters import slugify
+from django import forms
+from django.contrib.sites.models import Site
+from django.utils.encoding import force_text
 import os
-import uuid
-from django.urls import path
-# import traceback
 
-from .models import Gallery
-from .photologue_model_override import Photo
+
+logger = logging.getLogger('contests.forms')
 
 def save_photo(filename, contentfile, photo, gallery):
     current_site = Site.objects.get(id=settings.SITE_ID)
@@ -35,8 +29,6 @@ def save_photo(filename, contentfile, photo, gallery):
     photo.sites.add(current_site)
     gallery.photos.add(photo)
 
-
-logger = logging.getLogger('photologueOverride.forms')
 
 class UploadZipForm(RawUploadZipForm):
     thumbnail_size = forms.ModelChoiceField(PhotoSize.objects.all(),
@@ -134,6 +126,7 @@ class UploadZipForm(RawUploadZipForm):
                              fail_silently=True)
 
 
+
 class PhotoAdminForm(RawPhotoAdminForm):
     gallery = forms.ModelChoiceField(Gallery.objects.all(),
                                      label=_('Gallery'),
@@ -150,7 +143,6 @@ class PhotoAdminForm(RawPhotoAdminForm):
             kwargs['initial'].update({'gallery': kwargs['instance'].galleries.get()})
         super(PhotoAdminForm, self).__init__(*args, **kwargs)
         
-
     def save_m2m(self):
         return super()._save_m2m()
 
@@ -182,42 +174,3 @@ class PhotoAdminForm(RawPhotoAdminForm):
         save_photo(filename, image.file, photo, gallery)
 
         return photo
-
-
-class PhotoAdmin(RawPhotoAdmin):
-
-    change_list_template = 'change_list.html'
-    form = PhotoAdminForm
-    exclude = ['thumbnail_url', 'sites', 'src']
-
-    def get_urls(self):
-        urls = super(PhotoAdmin, self).get_urls()
-        custom_urls = [
-            url(r'^upload_zip/$',
-                self.admin_site.admin_view(self.upload_zip),
-                name='contests_upload_zip')
-        ]
-        return custom_urls + urls
-    
-    def upload_zip(self, request):
-
-        context = {
-            'title': _('Upload a zip archive of photos'),
-            'app_label': self.model._meta.app_label,
-            'opts': self.model._meta,
-            'has_change_permission': self.has_change_permission(request)
-        }
-
-        # Handle form request
-        if request.method == 'POST':
-            form = UploadZipForm(request.POST, request.FILES)
-            if form.is_valid():
-                form.save(request=request)
-                return HttpResponseRedirect('..')
-        else:
-            form = UploadZipForm()
-        context['form'] = form
-        context['adminform'] = helpers.AdminForm(form,
-                                                 list([(None, {'fields': form.base_fields})]),
-                                                 {})
-        return render(request, 'upload_zip.html', context)
