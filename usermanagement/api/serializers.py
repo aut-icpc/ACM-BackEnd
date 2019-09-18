@@ -64,7 +64,7 @@ class OnlineTeamSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         team, email = createContestants(validated_data, OnlineTeam, OnlineContestant)
-
+        send_mail(team.name, email, 'Create Online Contestant')
         return team
 
 

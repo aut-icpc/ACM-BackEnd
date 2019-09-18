@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from contests.models import Gallery, Contest, Photo
+from contests.models import Gallery, Contest, Photo, CurrentContest
 from django.conf import settings
 
 
@@ -25,10 +25,6 @@ class GallerySerializer(serializers.ModelSerializer):
         fields = ['title', 'photos']
         depth = 1
 
-    def to_representation(self, obj):
-        data = super().to_representation(obj)
-        return data
-
 
 class ContestSerializer(serializers.ModelSerializer):
     class Meta:
@@ -42,3 +38,10 @@ class ContestGalleriesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contest
         fields = ['galleries']
+
+class CurrentContestSerializer(serializers.ModelSerializer):
+    poster = serializers.ReadOnlyField(source='get_current_poster')
+    year = serializers.ReadOnlyField(source='main.year')
+    class Meta:
+        model = CurrentContest
+        fields = ['poster', 'year']

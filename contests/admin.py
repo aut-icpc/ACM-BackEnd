@@ -12,15 +12,15 @@ from django.conf.urls import url
 logger = logging.getLogger('contests.admin')
 
 
-# def unregister_photologue():
-#     from photologue.models import Gallery, PhotoEffect, PhotoSize, Watermark
+def unregister_photologue():
+    from photologue.models import Gallery, PhotoEffect, PhotoSize, Watermark
 
-#     admin.site.unregister(Gallery)
-#     admin.site.unregister(RawPhoto)
-#     admin.site.unregister(PhotoEffect)
-#     admin.site.unregister(Watermark)
+    admin.site.unregister(Gallery)
+    admin.site.unregister(RawPhoto)
+    admin.site.unregister(PhotoEffect)
+    admin.site.unregister(Watermark)
 
-# unregister_photologue()
+unregister_photologue()
 
 
 
@@ -97,5 +97,4 @@ class PhotoAdmin(RawPhotoAdmin):
 
 admin.site.register(Gallery, GalleryAdmin)
 admin.site.register(CurrentContest)
-admin.site.unregister(RawPhoto)
 admin.site.register(Photo, PhotoAdmin)
