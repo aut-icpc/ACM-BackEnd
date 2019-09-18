@@ -41,6 +41,15 @@ ONSITE_TEAM_STATUS_CHOICES = (
 
 ONLINE_TEAM_STATUS_CHOICES = () + TEAM_STATUS_CHOICES
 
+
+def send_mail(OnsiteContestantTeamName, OnsiteContestantEmail, MailMessagee=""):
+
+        subject = MailMessage
+        message =   'ali nazari ye chizi bego'
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = [OnsiteContestantEmail, ]   
+        sendMail (subject, message, email_from, recipient_list)
+
 class Country(models.Model):
     name = models.CharField(max_length=255)
     flag = models.ImageField()
@@ -56,6 +65,9 @@ class Team(models.Model):
 
     def __str__(self):
         return self.name
+    
+    class Meta:
+        abstract = True
 
 class OnlineTeam(Team):
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
@@ -81,14 +93,6 @@ class MailMessage(models.Model):
     def delete(self, *args, **kwargs):
         pass
 
-
-def send_mail(OnsiteContestantTeamName, OnsiteContestantEmail, MailMessagee=""):
-
-        subject = MailMessage
-        message =   'ali nazari ye chizi bego'
-        email_from = settings.EMAIL_HOST_USER
-        recipient_list = [OnsiteContestantEmail, ]   
-        sendMail (subject, message, email_from, recipient_list)
 
 class OnsiteTeam(Team):
     status = models.CharField(max_length=50, choices=ONSITE_TEAM_STATUS_CHOICES, default="PENDING")
@@ -119,10 +123,12 @@ class Contestant(models.Model):
     email = models.CharField(max_length=255, unique=True)
     phone_number = models.CharField(max_length=20, unique=True)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='contestants')
-
-
+    
     def __str__(self):
         return self.first_name + " " + self.last_name
+    
+    class Meta:
+        abstract = True
 
 
 class OnlineContestant(Contestant):
@@ -131,4 +137,4 @@ class OnlineContestant(Contestant):
 
 class OnsiteContestant(Contestant):
     shirt_size = models.CharField(max_length=20, choices=T_SHIRT_SIZE_CHOICES, default='M')
-    
+

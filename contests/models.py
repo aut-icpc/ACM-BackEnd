@@ -1,6 +1,5 @@
 from django.db import models
 from django.conf import settings
-from django.db import models
 from photologue.models import Gallery as RawGallery, Photo as RawPhoto, PhotoSizeCache, PhotoSize, IMAGE_EXIF_ORIENTATION_MAP
 from io import BytesIO
 from PIL import Image
@@ -19,19 +18,22 @@ class Contest (models.Model):
     def __str__(self):
         return 'ACM ' + str(self.year)
 
+
 # Makes the more recent contest the main one in case the main one is deleted.
 # An alternative Approach is commented to prohibit admin from deleting the main contest, having to change it to another one first.
 
-
 def get_latest_contest():
     return Contest.objects().latest('year')
-
 
 class CurrentContest(models.Model):
     main = models.ForeignKey(Contest, on_delete=models.SET('get_latest_contest'))
 
     class Meta:
         verbose_name_plural = 'Current Contest'
+
+    @property
+    def get_current_poster(self):
+        return settings.MEDIA_URL + main.poster.name
 
     @classmethod
     def load(cls):
@@ -40,7 +42,7 @@ class CurrentContest(models.Model):
 
     def save(self, *args, **kwargs):
         self.pk = 1
-        super(MailMessage, self).save(*args, **kwargs)
+        super(CurrentContest, self).save(*args, **kwargs)
     
     def delete(self, *args, **kwargs):
         pass
@@ -150,6 +152,3 @@ class Photo(RawPhoto):
             raise e
         # This returns the thumbnail's url
         return Path(im_filename)
-
-    def save(self, *args, **kwargs):
-        super(Photo, self).save(*args, **kwargs)  

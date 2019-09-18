@@ -3,13 +3,13 @@ from rest_framework.generics import (
     ListAPIView
 )
 
-from contests.models import Gallery, Contest
-from photologue.models import Photo
+from contests.models import Gallery, Contest, Photo, CurrentContest
 
 from .serializers import (
     GallerySerializer,
     ContestSerializer,
-    PhotoSerializer
+    PhotoSerializer,
+    CurrentContestSerializer
 )
 
 class PhotoView(RetrieveAPIView):
@@ -20,12 +20,14 @@ class GalleryRetrieveView(RetrieveAPIView):
     queryset = Gallery.objects.all()
     serializer_class = GallerySerializer
 
-
 class ContestRetrieveView(RetrieveAPIView):
     queryset = Contest.objects.all()
     serializer_class = PhotoSerializer
 
-
 class ContestListView(ListAPIView):
     queryset = Contest.objects.all()
     serializer_class = ContestSerializer
+
+class CurrentContestView(RetrieveAPIView):
+    queryset = CurrentContest.objects.get()
+    serializer_class = CurrentContestSerializer

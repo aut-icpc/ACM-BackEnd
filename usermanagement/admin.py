@@ -38,7 +38,6 @@ class OnsiteTeamAdmin(admin.ModelAdmin):
     form = OnsiteTeamForm
 
 
-admin.site.register(Team)
 admin.site.register(OnsiteTeam, OnsiteTeamAdmin)
 admin.site.register(OnlineTeam, OnlineTeamAdmin)
 admin.site.register(OnlineContestant)
