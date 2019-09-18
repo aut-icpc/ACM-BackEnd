@@ -5,7 +5,7 @@ from django.contrib.admin import helpers
 from django.shortcuts import render
 from django.conf.urls import url
 from django import forms
-from photologue.models import Photo as RawPhoto, PhotoSize
+from photologue.models import PhotoSize
 from photologue.admin import GalleryAdmin as RawGalleryAdmin, PhotoAdmin as RawPhotoAdmin, PhotoAdminForm as RawPhotoAdminForm
 import logging
 from django.conf import settings
@@ -30,7 +30,7 @@ def save_photo(filename, contentfile, photo, gallery):
     current_site = Site.objects.get(id=settings.SITE_ID)
     photo.image.save(filename, contentfile)
     photo.save()
-    photo.set_photo_src()
+    photo.pre_cache()
     photo.set_thumbnail_url()
     photo.sites.add(current_site)
     gallery.photos.add(photo)
@@ -142,6 +142,15 @@ class PhotoAdminForm(RawPhotoAdminForm):
         model = Photo
         fields = '__all__'
 
+    def __init__(self, *args, **kwargs):
+        if 'instance' in kwargs:
+            print(kwargs['instance'])
+            if 'initial' not in kwargs:
+                kwargs['initial'] = {}
+            kwargs['initial'].update({'gallery': kwargs['instance'].galleries.get()})
+        super(PhotoAdminForm, self).__init__(*args, **kwargs)
+        
+
     def save_m2m(self):
         return super()._save_m2m()
 
@@ -163,18 +172,21 @@ class PhotoAdminForm(RawPhotoAdminForm):
         photo_title = self.cleaned_data['title'] if self.cleaned_data['title'] else gallery.title
 
         slug = slugify(photo_title)
-        photo = Photo(title=photo_title,
+        photo, created = Photo.objects.update_or_create(title=photo_title,
                           slug=slug,
                           caption=self.cleaned_data['caption'],
                           is_public=self.cleaned_data['is_public'],
                           thumbnail_size=self.cleaned_data['thumbnail_size'])
-        
+        if not created:
+            photo.galleries.remove()
         save_photo(filename, image.file, photo, gallery)
+
         return photo
 
 
 class PhotoAdmin(RawPhotoAdmin):
 
+    change_list_template = 'change_list.html'
     form = PhotoAdminForm
     exclude = ['thumbnail_url', 'sites', 'src']
 
@@ -208,4 +220,4 @@ class PhotoAdmin(RawPhotoAdmin):
         context['adminform'] = helpers.AdminForm(form,
                                                  list([(None, {'fields': form.base_fields})]),
                                                  {})
-        return render(request, 'admin/photologue/photo/upload_zip.html', context)
+        return render(request, 'upload_zip.html', context)

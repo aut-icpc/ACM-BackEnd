@@ -1,5 +1,5 @@
 from django.db import models
-from photologue.models import Gallery as RawGallery, Photo as RawPhoto, PhotoSizeCache, PhotoSize
+from photologue.models import Gallery as RawGallery, PhotoSizeCache, PhotoSize
 from django.conf import settings
 from .photologue_model_override import Photo
 
@@ -9,6 +9,8 @@ class Contest(models.Model):
     problems = models.CharField(max_length=500) 
     final_ranking_onsite = models.CharField(max_length=500)
     final_ranking_online = models.CharField(max_length=500)
+    poster = models.ImageField(verbose_name='poster')
+
 
     def __str__(self):
         return 'ACM ' + str(self.year)
