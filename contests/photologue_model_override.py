@@ -14,7 +14,6 @@ import traceback
 class Photo(RawPhoto):
     thumbnail_size = models.ForeignKey(PhotoSize, related_name='contest_photo', on_delete=models.DO_NOTHING)
     thumbnail_url = models.TextField(verbose_name='thumbnail_url')
-    src = models.TextField(verbose_name='src')
 
 
     thumbnail_urls = OrderedDict()
@@ -23,25 +22,23 @@ class Photo(RawPhoto):
         verbose_name = 'Contest Photo'
 
     @property
+    def get_thumbnail_url(self):
+        return self.thumbnail_url
+
+    @property
     def get_thumbnail_size(self):
         ts = self.thumbnail_size
         return [ts.height, ts.width]
-    
-    def set_photo_src(self):
-        if len(self.src) == 0:
-            self.src = settings.MEDIA_URL + self.image.name
-        return self.src
 
     def set_thumbnail_url(self):
-        print(self.thumbnail_urls)
         if len(self.thumbnail_url) == 0:
             self.thumbnail_url = self.thumbnail_urls[self.thumbnail_size.name]
-            
+        print(self.thumbnail_url)
+
         return self.thumbnail_url
 
     
     def pre_cache(self):
-
         photosize = self.thumbnail_size
         if photosize.pre_cache:
             photosize_url = self.create_size(photosize)
@@ -49,7 +46,7 @@ class Photo(RawPhoto):
             photosize_dir = str(photosize_url)
             # Windows compatibility in debug mode.
             photosize_win_dir = photosize_dir.replace("\\", "/")
-            if photosize.name not in self.thumbnail_urls.keys():
+            if photosize.name not in self.thumbnail_urls.keys() and photosize_win_dir != "None":
                 self.thumbnail_urls.update({
                     photosize.name: settings.MEDIA_URL + photosize_win_dir
                 })
@@ -108,10 +105,4 @@ class Photo(RawPhoto):
         return Path(im_filename)
 
     def save(self, *args, **kwargs):
-        self.validate_unique()
         super(Photo, self).save(*args, **kwargs)  
-
-
-# @receiver(post_save, sender=Photo, dispatch_uid="add_photo_src")
-# def add_photo_src(sender, instance, **kwargs):
-#     instance.set_photo_src()

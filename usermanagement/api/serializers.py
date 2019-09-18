@@ -48,6 +48,7 @@ class OnsiteTeamSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         team, email = createContestants(validated_data, OnsiteTeam, OnsiteContestant)
+        
         return team
 
 
