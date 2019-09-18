@@ -1,21 +1,24 @@
 from rest_framework import serializers
+from django.core.mail import send_mail
+from django.conf import settings
 from usermanagement.models import (
     Country,
     OnlineTeam,
     OnsiteTeam,
     OnlineContestant,
-    OnsiteContestant
+    OnsiteContestant,
+    Team,   
+    send_mail
 )
+
 
 contestant_fields = ['first_name', 'last_name', 'gender', 
 'edu_level', 'student_number', 'email', 'phone_number']
 team_fields = ['name', 'status', 'institution', 'contestants']
 
 class OnsiteContestantSerializer(serializers.ModelSerializer):
-    # team = serializers.CharField(max_length=255)
     class Meta:
         model = OnsiteContestant
-        # exclude = ('team',)
         fields = contestant_fields
 
     
@@ -31,7 +34,7 @@ class CountrySerializer(serializers.ModelSerializer):
         fields = '__all__'
     
 
-def createContestants(validated_data, TeamType, ContstantType):
+def createContestants(validated_data, TeamType, ContestantType):
     contestants_data = validated_data.pop('contestants')
     team = TeamType.objects.create(**validated_data)
     email = contestants_data[0]['email']
@@ -40,14 +43,17 @@ def createContestants(validated_data, TeamType, ContstantType):
     return team, email
 
 
+
 class OnsiteTeamSerializer(serializers.ModelSerializer):
+    
     contestants = OnsiteContestantSerializer(many=True)
     class Meta:
-        model = OnsiteTeam
-        fields = team_fields
+         model = OnsiteTeam
+         fields = team_fields   
 
     def create(self, validated_data):
         team, email = createContestants(validated_data, OnsiteTeam, OnsiteContestant)
+        mail(team.name,email)
         return team
 
 
@@ -59,6 +65,7 @@ class OnlineTeamSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         team, email = createContestants(validated_data, OnlineTeam, OnlineContestant)
+
         return team
 
 
@@ -74,18 +81,3 @@ class OnsiteTeamListSerializer(serializers.ModelSerializer):
         model = OnsiteTeam
         fields = '__all__'
     
-
-
-
-    # def create(self, validated_data):
-    #     team_name = validated_data.pop('team')
-    #     team = Team.objects.get(name=team_name)
-    #     validated_data.update({
-    #         'team':team
-    #     })
-    #     obj = OnsiteContestant.objects.create(**validated_data)
-    #     obj.save()
-    #     return obj
-
-# phone_regex = RegexValidator(regex="09[0-9]{9}", message="Phone number must be entered correctly.")
-# phone_number = models.CharField(validators=[phone_regex], max_length=12, unique=True)
