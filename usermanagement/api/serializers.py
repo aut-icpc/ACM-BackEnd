@@ -7,32 +7,31 @@ from usermanagement.models import (
     OnsiteTeam,
     OnlineContestant,
     OnsiteContestant,
-    Team,   
+    Team,
     send_mail
 )
 
-
-contestant_fields = ['first_name', 'last_name', 'gender', 
-'edu_level', 'student_number', 'email', 'phone_number']
+contestant_fields = ['first_name', 'last_name', 'gender', 'edu_level', 'student_number', 'email', 'phone_number']
 team_fields = ['name', 'status', 'institution', 'contestants']
+
 
 class OnsiteContestantSerializer(serializers.ModelSerializer):
     class Meta:
         model = OnsiteContestant
         fields = contestant_fields
 
-    
+
 class OnlineContestantSerializer(serializers.ModelSerializer):
     class Meta:
-        model = OnlineContestant 
+        model = OnlineContestant
         fields = contestant_fields
- 
+
 
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country 
         fields = '__all__'
-    
+ 
 
 def createContestants(validated_data, TeamType, ContestantType):
     contestants_data = validated_data.pop('contestants')
@@ -43,22 +42,22 @@ def createContestants(validated_data, TeamType, ContestantType):
     return team, email
 
 
-
 class OnsiteTeamSerializer(serializers.ModelSerializer):
-    
     contestants = OnsiteContestantSerializer(many=True)
+
     class Meta:
-         model = OnsiteTeam
-         fields = team_fields   
+        model = OnsiteTeam
+        fields = team_fields   
 
     def create(self, validated_data):
         team, email = createContestants(validated_data, OnsiteTeam, OnsiteContestant)
-        mail(team.name,email)
+        send_mail( team.name, email, 'Create Onsite Contestant')
         return team
 
 
 class OnlineTeamSerializer(serializers.ModelSerializer):
     contestants = OnlineContestantSerializer(many=True)
+
     class Meta:
         model = OnlineTeam
         fields = team_fields + ['country']
@@ -71,6 +70,7 @@ class OnlineTeamSerializer(serializers.ModelSerializer):
 
 class OnlineTeamListSerializer(serializers.ModelSerializer):
     country = serializers.SlugRelatedField(slug_field='name', read_only=True)
+
     class Meta:
         model = OnlineTeam
         fields = ['name', 'institution', 'status', 'country']
@@ -80,4 +80,3 @@ class OnsiteTeamListSerializer(serializers.ModelSerializer):
     class Meta:
         model = OnsiteTeam
         fields = '__all__'
-    
