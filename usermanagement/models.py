@@ -2,6 +2,11 @@ from django.db import models
 from django.contrib.postgres import fields
 from django.core.validators import RegexValidator
 
+from django.core.mail import send_mail as sendMail
+from django.conf import settings
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 # Create your models here.
 
 EDU_LEVEL_CHOICES = (
@@ -56,9 +61,55 @@ class OnlineTeam(Team):
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
     status = models.CharField(max_length=50, choices=ONLINE_TEAM_STATUS_CHOICES, default='PENDING')
 
+
+class MailMessage(models.Model):
+    # contest = models.OneToOneField()
+    paid = models.TextField(default='Paid')
+    reserved = models.TextField(default="Reserved registration beforehand")
+    pending = models.TextField(default="Pending")
+    approved = models.TextField(default="Approved for participation")
+    denied = models.TextField(default="Denied Participation")
+
+    @classmethod
+    def load(cls):
+        obj, created = cls.objects.get_or_create(pk=1)
+        return obj
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super(MailMessage, self).save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        pass
+
+
+def send_mail(OnsiteContestantTeamName, OnsiteContestantEmail, MailMessagee=""):
+
+        subject = MailMessage
+        message =   'ali nazari ye chizi bego'
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = [OnsiteContestantEmail, ]   
+        sendMail (subject, message, email_from, recipient_list)
+
 class OnsiteTeam(Team):
     status = models.CharField(max_length=50, choices=ONSITE_TEAM_STATUS_CHOICES, default="PENDING")
 
+    def save(self, *args, **kwargs):
+       
+        email =  OnsiteContestant.objects.filter(team=self.pk)[0].email
+        mailmessage = MailMessage.load()
+        
+        if self.status == 'RESERVED':
+            send_mail(self.name, email, mailmessage.reserved)
+        elif self.status == 'APPROVED':
+            send_mail(self.name, mail, mailmessage.approved)
+        elif self.status == 'PAID':
+            send_mail(self.name, mail, mailmessage.paid)
+        elif self.status == ' REJECTED':
+            send_mail(self.name, mail, mailmessage.paid)
+      
+        super(OnsiteTeam, self).save(*args, **kwargs)
+        
 
 class Contestant(models.Model):
     first_name = models.CharField(max_length=255)
@@ -68,7 +119,6 @@ class Contestant(models.Model):
     student_number = models.CharField(max_length=255)
     email = models.CharField(max_length=255, unique=True)
     phone_number = models.CharField(max_length=20, unique=True)
-
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='contestants')
 
 

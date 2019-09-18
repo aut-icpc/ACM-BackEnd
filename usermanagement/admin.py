@@ -6,7 +6,9 @@ from .models import (
     OnsiteTeam,
     OnlineContestant,
     OnsiteContestant,
-    Country
+    Country,
+    Team,
+    MailMessage
 )
 
 # Register your models here.
@@ -35,8 +37,11 @@ class OnlineTeamAdmin(admin.ModelAdmin):
 class OnsiteTeamAdmin(admin.ModelAdmin):
     form = OnsiteTeamForm
 
+
+admin.site.register(Team)
 admin.site.register(OnsiteTeam, OnsiteTeamAdmin)
 admin.site.register(OnlineTeam, OnlineTeamAdmin)
 admin.site.register(OnlineContestant)
 admin.site.register(OnsiteContestant)
 admin.site.register(Country)
+admin.site.register(MailMessage)
