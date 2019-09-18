@@ -12,6 +12,9 @@ from .serializers import (
     PhotoSerializer
 )
 
+class PhotoView(RetrieveAPIView):
+    queryset = Photo.objects.all()
+    serializer_class = PhotoSerializer
 
 class GalleryRetrieveView(RetrieveAPIView):
     queryset = Gallery.objects.all()

@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.sites',
     'django.contrib.flatpages',
-    'sorl.thumbnail',
+    'photologue',
+    'sortedm2m',
     'mainsite',
     'usermanagement',
 ]
@@ -67,13 +68,18 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(ACM_WEBSITE, "public")],
-        'APP_DIRS': True,
+        # 'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+            ],
+            'loaders': [
+                'django.template.loaders.filesystem.Loader',
+                'django.template.loaders.app_directories.Loader',
+                'admin_tools.template_loaders.Loader',
             ],
         },
     },
@@ -89,11 +95,12 @@ DATABASES = {
     'default': {
        
         # Local:
-        # 'NAME': 'acm',
-        # 'USER': 'postgres',
-        # 'PASSWORD': 'acm',
-        # 'HOST': 'localhost',
-        # 'PORT': '5432',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'acm',
+        'USER': 'postgres',
+        'PASSWORD': 'acm',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
@@ -141,7 +148,8 @@ STATIC_URL = '/static/'
 #     "http://localhost:3000/*",
 # ]
 
-MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'mainsite')
+MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'images')
+MEDIA_URL = '/images/'
 
 CORS_ORIGIN_ALLOW_ALL = True
 
