@@ -3,3 +3,4 @@
 /icpcsite/settings.py
 *.pyc
 */__pycache__
+*.env
