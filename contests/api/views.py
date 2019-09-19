@@ -10,7 +10,8 @@ from .serializers import (
     GallerySerializer,
     ContestSerializer,
     PhotoSerializer,
-    CurrentContestSerializer
+    CurrentContestSerializer,
+    ContestGalleriesSerializer
 )
 
 class PhotoView(RetrieveAPIView):
@@ -23,7 +24,7 @@ class GalleryRetrieveView(RetrieveAPIView):
 
 class ContestRetrieveView(RetrieveAPIView):
     # queryset = Contest.objects.all()
-    serializer_class = ContestSerializer
+    serializer_class = ContestGalleriesSerializer
     lookup_field = 'year'
 
     def get_queryset(self):

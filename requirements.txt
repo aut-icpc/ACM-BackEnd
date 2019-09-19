@@ -1,0 +1,6 @@
+Django
+django-admin-tools
+django-cors-headers
+djangorestframework
+django-photologue==3.10
+django-sortedm2m==2.0.0

@@ -10,7 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
+from dotenv import load_dotenv
 import os
+
+load_dotenv()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -23,7 +26,7 @@ ACM_WEBSITE = os.path.join(FRONT_BASE, "acmWebsite")
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '15##&2)$ubwr(ldj!a)1ud81m^aq%pwrw+d^=2a6u$3zifu58i'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -96,11 +99,11 @@ DATABASES = {
        
         # Local:
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'acm',
-        'USER': 'postgres',
-        'PASSWORD': 'acm',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': os.getenv('POSTGRES_DATABASE_NAME')
+        'USER': os.getenv('POSTGRES_USER')
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD')
+        'HOST': os.getenv('POSTGRES_HOST')
+        'PORT': os.getenv('POSTGRES_PORT')
     }
 }
 
