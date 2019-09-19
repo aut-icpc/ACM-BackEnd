@@ -1,11 +1,11 @@
 from django.db import models
 from django.contrib.postgres import fields
 from django.core.validators import RegexValidator
-
 from django.core.mail import send_mail as sendMail
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+# from polymorphic.models import PolymorphicModel
 
 # Create your models here.
 
@@ -50,6 +50,7 @@ def send_mail(OnsiteContestantTeamName, OnsiteContestantEmail, MailMessagee=""):
         recipient_list = [OnsiteContestantEmail, ]   
         sendMail (subject, message, email_from, recipient_list)
 
+
 class Country(models.Model):
     name = models.CharField(max_length=255)
     flag = models.ImageField()
@@ -66,32 +67,9 @@ class Team(models.Model):
     def __str__(self):
         return self.name
     
-    class Meta:
-        abstract = True
-
 class OnlineTeam(Team):
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
     status = models.CharField(max_length=50, choices=ONLINE_TEAM_STATUS_CHOICES, default='PENDING')
-
-
-class MailMessage(models.Model):
-    paid = models.TextField(default='Paid')
-    reserved = models.TextField(default="Reserved registration beforehand")
-    pending = models.TextField(default="Pending")
-    approved = models.TextField(default="Approved for participation")
-    denied = models.TextField(default="Denied Participation")
-
-    @classmethod
-    def load(cls):
-        obj, created = cls.objects.get_or_create(pk=1)
-        return obj
-
-    def save(self, *args, **kwargs):
-        self.pk = 1
-        super(MailMessage, self).save(*args, **kwargs)
-    
-    def delete(self, *args, **kwargs):
-        pass
 
 
 class OnsiteTeam(Team):
@@ -114,6 +92,25 @@ class OnsiteTeam(Team):
         super(OnsiteTeam, self).save(*args, **kwargs)
         
 
+class MailMessage(models.Model):
+    paid = models.TextField(default='Paid')
+    reserved = models.TextField(default="Reserved registration beforehand")
+    pending = models.TextField(default="Pending")
+    approved = models.TextField(default="Approved for participation")
+    denied = models.TextField(default="Denied Participation")
+
+    @classmethod
+    def load(cls):
+        obj, created = cls.objects.get_or_create(pk=1)
+        return obj
+
+    def save(self, *args, **kwargs):
+        self.pk = 1
+        super(MailMessage, self).save(*args, **kwargs)
+    
+    def delete(self, *args, **kwargs):
+        pass
+
 class Contestant(models.Model):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
@@ -127,8 +124,8 @@ class Contestant(models.Model):
     def __str__(self):
         return self.first_name + " " + self.last_name
     
-    class Meta:
-        abstract = True
+    # class Meta:
+    #     abstract = True
 
 
 class OnlineContestant(Contestant):
