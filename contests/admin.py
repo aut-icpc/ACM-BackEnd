@@ -7,6 +7,9 @@ from django import forms
 from .forms import PhotoAdminForm, UploadZipForm
 import logging
 from django.conf.urls import url
+from django.http import HttpResponseRedirect
+from django.contrib.admin import helpers
+from django.shortcuts import render
 
 
 logger = logging.getLogger('contests.admin')
@@ -48,6 +51,8 @@ class GalleryAdminForm(forms.ModelForm):
     class Meta:
         model = Gallery
         exclude = ['description', 'sites']
+
+    # def __init__(self, *args, **kwargs):
 
 
 class GalleryAdmin(RawGalleryAdmin):
