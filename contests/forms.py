@@ -15,6 +15,7 @@ from django.template.defaultfilters import slugify
 from django import forms
 from django.contrib.sites.models import Site
 from django.utils.encoding import force_text
+from django.contrib import messages
 import os
 
 
@@ -24,13 +25,14 @@ logger = logging.getLogger('contests.forms')
 def save_photo(filename, contentfile, photo, gallery):
     current_site = Site.objects.get(id=settings.SITE_ID)
     photo.image.save(filename, contentfile)
+    print(photo.image.__dict__)
     photo.save()
-    photo.pre_cache()
     photo.set_thumbnail_url()
     photo.sites.add(current_site)
     gallery.photos.add(photo)
 
 
+# Still needs some extra validation to avoid bugs, HINT: look at the form method create_or_get
 class UploadZipForm(RawUploadZipForm):
     thumbnail_size = forms.ModelChoiceField(PhotoSize.objects.all(),
                                      label=_('PhotoSize'),
@@ -131,19 +133,18 @@ class PhotoAdminForm(RawPhotoAdminForm):
     gallery = forms.ModelChoiceField(Gallery.objects.all(),
                                      label=_('Gallery'),
                                      required=True)
-    
+
     class Meta:
         model = Photo
         fields = '__all__'
 
     def __init__(self, *args, **kwargs):
-        if 'instance' in kwargs:
-            print(kwargs['instance'])
+        if 'instance' in kwargs and kwargs['instance']:
             if 'initial' not in kwargs:
                 kwargs['initial'] = {}
             kwargs['initial'].update({'gallery': kwargs['instance'].galleries.get()})
         super(PhotoAdminForm, self).__init__(*args, **kwargs)
-        
+
     def save_m2m(self):
         return super()._save_m2m()
 
@@ -161,7 +162,10 @@ class PhotoAdminForm(RawPhotoAdminForm):
                                              is_public=self.cleaned_data['is_public'])
         image = self.cleaned_data['image']
         filename = image.name
-        
+        ## Could it work here?
+        print("HOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
+        print(image.__dict__)
+     
         photo_title = self.cleaned_data['title'] if self.cleaned_data['title'] else gallery.title
 
         slug = slugify(photo_title)

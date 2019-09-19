@@ -6,6 +6,9 @@ from PIL import Image
 from django.core.files.base import ContentFile
 from pathlib import Path
 from collections import OrderedDict
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+import os
 
 
 class Contest (models.Model):
@@ -148,4 +151,8 @@ class Photo(RawPhoto):
                 self.image.storage.delete(im_filename)
             raise e
         # This returns the thumbnail's url
-        return Path(im_filename)
+        path = Path(im_filename)
+
+        # Not sure if necessary
+        im.close()
+        return path

@@ -14,10 +14,6 @@ load_dotenv()
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-BACK_BASE = os.path.dirname(BASE_DIR)
-SITE_BASE = os.path.dirname(BACK_BASE)
-FRONT_BASE = os.path.join(SITE_BASE, "Front-End")
-ACM_WEBSITE = os.path.join(FRONT_BASE, "acmWebsite")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
@@ -72,7 +68,6 @@ ROOT_URLCONF = 'icpcsite.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(ACM_WEBSITE, "public")],
         # 'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -149,8 +144,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
 
+
+## Should be uncommented in production!
 # CORS_ORIGIN_WHITE_LIST = [
-#     "http://localhost:3000/*",
+#     os.getenv('WHITELIST'),
 # ]
 
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'images')
@@ -158,7 +155,7 @@ MEDIA_URL = '/images/'
 
 STATICFILES_DIRS = [
     MEDIA_ROOT.replace("\\", "/"),
-    
+    '/static/',
 ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -168,6 +165,7 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 
+## Should be commented in production!
 CORS_ORIGIN_ALLOW_ALL = True
 
 SITE_ID = 1
