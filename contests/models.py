@@ -25,6 +25,7 @@ class Contest (models.Model):
 def get_latest_contest():
     return Contest.objects().latest('year')
 
+
 class CurrentContest(models.Model):
     main = models.ForeignKey(Contest, on_delete=models.SET('get_latest_contest'))
 
@@ -33,7 +34,7 @@ class CurrentContest(models.Model):
 
     @property
     def get_current_poster(self):
-        return settings.MEDIA_URL + self.main.poster.name
+        return settings.STATIC_URL + self.main.poster.name
 
     @classmethod
     def load(cls):
@@ -43,7 +44,7 @@ class CurrentContest(models.Model):
     def save(self, *args, **kwargs):
         self.pk = 1
         super(CurrentContest, self).save(*args, **kwargs)
-    
+
     def delete(self, *args, **kwargs):
         pass
 
@@ -60,10 +61,10 @@ class Gallery(RawGallery):
     def __str__(self):
         return 'ACM ' + self.contest.year + ' ' + self.title
 
+
 class Photo(RawPhoto):
     thumbnail_size = models.ForeignKey(PhotoSize, related_name='contest_photo', on_delete=models.DO_NOTHING)
     thumbnail_url = models.TextField(verbose_name='thumbnail_url')
-
 
     thumbnail_urls = OrderedDict()
 
@@ -82,11 +83,9 @@ class Photo(RawPhoto):
     def set_thumbnail_url(self):
         if len(self.thumbnail_url) == 0:
             self.thumbnail_url = self.thumbnail_urls[self.thumbnail_size.name]
-        print(self.thumbnail_url)
 
         return self.thumbnail_url
 
-    
     def pre_cache(self):
         photosize = self.thumbnail_size
         if photosize.pre_cache:
@@ -97,10 +96,8 @@ class Photo(RawPhoto):
             photosize_win_dir = photosize_dir.replace("\\", "/")
             if photosize.name not in self.thumbnail_urls.keys() and photosize_win_dir != "None":
                 self.thumbnail_urls.update({
-                    photosize.name: settings.MEDIA_URL + photosize_win_dir
+                    photosize.name: settings.STATIC_URL + photosize_win_dir
                 })
-        
-    
 
     def create_size(self, photosize):
         if self.size_exists(photosize):

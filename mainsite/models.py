@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import ValidationError
+from ckeditor.fields import RichTextField
 
 # Create your models here.
 
@@ -21,28 +22,14 @@ class Countdown(models.Model):
     def __str__(self):
         return "Homepage countdown time"
 
+    @classmethod
+    def load(cls):
+        obj, created = cls.objects.get_or_create(pk=1)
+        return obj
+
     def save(self, *args, **kwargs):
-        if Countdown.objects.exists() and not self.pk:
-            raise ValidationError('There can be only one Countdown')
-        return super(Countdown, self).save(*args, **kwargs)
+        self.pk = 1
+        super(Countdown, self).save(*args, **kwargs)
 
-
-# class Contest(models.Model):
-#     date = models.DateField()
-#     title = models.TextField()
-
-#     def __str__(self):
-#         return self.title
-
-
-# class ContestImage(models.Model):
-#     imageFile = models.ImageField(upload_to="")
-#     contest = models.ForeignKey(Contest, on_delete=None)
-#     caption = models.TextField(default="")
-#     #
-
-#     def __str__(self):
-#         return self.caption
-        
-# class MainContest(models.Model):
-#     pass
+    def delete(self, *args, **kwargs):
+        pass

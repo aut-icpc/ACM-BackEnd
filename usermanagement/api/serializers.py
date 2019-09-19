@@ -1,15 +1,14 @@
 from rest_framework import serializers
-from django.core.mail import send_mail
 from django.conf import settings
-from usermanagement.models import (
+from .models import (
     Country,
     OnlineTeam,
     OnsiteTeam,
     OnlineContestant,
     OnsiteContestant,
     Team,
-    send_mail
 )
+from ..utils import send_mail
 
 contestant_fields = ['first_name', 'last_name', 'gender', 'edu_level', 'student_number', 'email', 'phone_number']
 team_fields = ['name', 'status', 'institution', 'contestants']
@@ -31,7 +30,7 @@ class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country 
         fields = '__all__'
- 
+
 
 def createContestants(validated_data, TeamType, ContestantType):
     contestants_data = validated_data.pop('contestants')

@@ -1,12 +1,8 @@
 from django.db import models
 from django.contrib.postgres import fields
 from django.core.validators import RegexValidator
-from django.core.mail import send_mail as sendMail
 from django.conf import settings
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-# from polymorphic.models import PolymorphicModel
-
+from .utils import send_mail
 # Create your models here.
 
 EDU_LEVEL_CHOICES = (
@@ -42,23 +38,16 @@ ONSITE_TEAM_STATUS_CHOICES = (
 ONLINE_TEAM_STATUS_CHOICES = () + TEAM_STATUS_CHOICES
 
 
-def send_mail(OnsiteContestantTeamName, OnsiteContestantEmail, MailMessagee=""):
-
-        subject = MailMessage
-        message =   'ali nazari ye chizi bego'
-        email_from = settings.EMAIL_HOST_USER
-        recipient_list = [OnsiteContestantEmail, ]   
-        sendMail (subject, message, email_from, recipient_list)
-
-
 class Country(models.Model):
     name = models.CharField(max_length=255)
     flag = models.ImageField()
+
     class Meta:
         verbose_name_plural = 'Countries'
 
     def __str__(self):
         return self.name
+
 
 class Team(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -76,10 +65,10 @@ class OnsiteTeam(Team):
     status = models.CharField(max_length=50, choices=ONSITE_TEAM_STATUS_CHOICES, default="PENDING")
 
     def save(self, *args, **kwargs):
-       
-        email =  OnsiteContestant.objects.filter(team=self.pk)[0].email
+
+        email = OnsiteContestant.objects.filter(team=self.pk)[0].email
         mailmessage = MailMessage.load()
-        
+
         if self.status == 'RESERVED':
             send_mail(self.name, email, mailmessage.reserved)
         elif self.status == 'APPROVED':
@@ -88,9 +77,9 @@ class OnsiteTeam(Team):
             send_mail(self.name, mail, mailmessage.paid)
         elif self.status == ' REJECTED':
             send_mail(self.name, mail, mailmessage.paid)
-      
+
         super(OnsiteTeam, self).save(*args, **kwargs)
-        
+
 
 class MailMessage(models.Model):
     paid = models.TextField(default='Paid')
@@ -107,9 +96,10 @@ class MailMessage(models.Model):
     def save(self, *args, **kwargs):
         self.pk = 1
         super(MailMessage, self).save(*args, **kwargs)
-    
+
     def delete(self, *args, **kwargs):
         pass
+
 
 class Contestant(models.Model):
     first_name = models.CharField(max_length=255)
@@ -120,18 +110,17 @@ class Contestant(models.Model):
     email = models.CharField(max_length=255, unique=True)
     phone_number = models.CharField(max_length=20, unique=True)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='contestants')
-    
+ 
     def __str__(self):
         return self.first_name + " " + self.last_name
-    
+
     # class Meta:
     #     abstract = True
 
 
 class OnlineContestant(Contestant):
     pass
-    
+
 
 class OnsiteContestant(Contestant):
     shirt_size = models.CharField(max_length=20, choices=T_SHIRT_SIZE_CHOICES, default='M')
-
