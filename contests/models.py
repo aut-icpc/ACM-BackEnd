@@ -33,7 +33,7 @@ class CurrentContest(models.Model):
 
     @property
     def get_current_poster(self):
-        return settings.MEDIA_URL + main.poster.name
+        return settings.MEDIA_URL + self.main.poster.name
 
     @classmethod
     def load(cls):

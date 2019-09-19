@@ -1,6 +1,7 @@
 from rest_framework.generics import (
     RetrieveAPIView,
-    ListAPIView
+    ListAPIView,
+
 )
 
 from contests.models import Gallery, Contest, Photo, CurrentContest
@@ -21,13 +22,21 @@ class GalleryRetrieveView(RetrieveAPIView):
     serializer_class = GallerySerializer
 
 class ContestRetrieveView(RetrieveAPIView):
-    queryset = Contest.objects.all()
-    serializer_class = PhotoSerializer
+    # queryset = Contest.objects.all()
+    serializer_class = ContestSerializer
+    lookup_field = 'year'
+
+    def get_queryset(self):
+        year = self.request.query_params.get('year')
+        queryset = Contest.objects.filter(year=year)
+        return queryset
+
+
 
 class ContestListView(ListAPIView):
     queryset = Contest.objects.all()
     serializer_class = ContestSerializer
 
-class CurrentContestView(RetrieveAPIView):
-    queryset = CurrentContest.objects.get()
+class CurrentContestView(ListAPIView):
+    queryset = CurrentContest.objects.filter(pk=1)
     serializer_class = CurrentContestSerializer
