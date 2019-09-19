@@ -20,6 +20,7 @@ import os
 
 logger = logging.getLogger('contests.forms')
 
+
 def save_photo(filename, contentfile, photo, gallery):
     current_site = Site.objects.get(id=settings.SITE_ID)
     photo.image.save(filename, contentfile)
@@ -47,8 +48,8 @@ class UploadZipForm(RawUploadZipForm):
         else:
             logger.debug(
                 force_text('Creating new gallery "{0}".').format(self.cleaned_data['title']))
-                
-            #Changed gallery to extendedGallery
+
+            # Changed gallery to extendedGallery
             gallery = Gallery.objects.create(title=self.cleaned_data['title'],
                                              slug=slugify(self.cleaned_data['title']),
                                              description=self.cleaned_data['description'],
@@ -126,11 +127,11 @@ class UploadZipForm(RawUploadZipForm):
                              fail_silently=True)
 
 
-
 class PhotoAdminForm(RawPhotoAdminForm):
     gallery = forms.ModelChoiceField(Gallery.objects.all(),
                                      label=_('Gallery'),
                                      required=True)
+    
     class Meta:
         model = Photo
         fields = '__all__'

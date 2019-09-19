@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from contests.models import Gallery, Contest, Photo, CurrentContest
 from django.conf import settings
+from .ut
 
 
 class PhotoSerializer(serializers.ModelSerializer):
@@ -14,7 +15,7 @@ class PhotoSerializer(serializers.ModelSerializer):
         depth = 1
 
     def get_src(self, obj):
-        return settings.MEDIA_URL + obj.image.name
+        return settings.STATIC_URL + obj.image.name
 
 
 class GallerySerializer(serializers.ModelSerializer):
@@ -39,9 +40,11 @@ class ContestGalleriesSerializer(serializers.ModelSerializer):
         model = Contest
         fields = ['galleries']
 
+
 class CurrentContestSerializer(serializers.ModelSerializer):
     poster = serializers.ReadOnlyField(source='get_current_poster')
     year = serializers.ReadOnlyField(source='main.year')
+
     class Meta:
         model = CurrentContest
         fields = ['poster', 'year']

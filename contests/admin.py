@@ -23,7 +23,6 @@ def unregister_photologue():
 unregister_photologue()
 
 
-
 class ContestAdmin(admin.ModelAdmin):
     list_display = ('year', 'show_problem', 'show_final_ranking_onsite', 'show_final_ranking_online', )
     search_fields = ['year ']
@@ -70,7 +69,7 @@ class PhotoAdmin(RawPhotoAdmin):
                 name='contests_upload_zip')
         ]
         return custom_urls + urls
-    
+
     def upload_zip(self, request):
 
         context = {
