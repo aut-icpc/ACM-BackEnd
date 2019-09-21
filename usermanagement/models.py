@@ -3,7 +3,6 @@ from django.contrib.postgres import fields
 from django.core.validators import RegexValidator
 from django.conf import settings
 from .utils import send_mail
-# Create your models here.
 
 EDU_LEVEL_CHOICES = (
     ('BSC', 'BSc'),
@@ -70,23 +69,29 @@ class OnsiteTeam(Team):
         mailmessage = MailMessage.load()
 
         if self.status == 'RESERVED':
-            send_mail(self.name, email, mailmessage.reserved)
+            send_mail(self.name, email, mailmessage.reserved_subject, mailmessage.reserved_contenet)
         elif self.status == 'APPROVED':
-            send_mail(self.name, mail, mailmessage.approved)
+            send_mail(self.name, email, mailmessage.approved_subject, mailmessage.approved_content)
         elif self.status == 'PAID':
-            send_mail(self.name, mail, mailmessage.paid)
+            send_mail(self.name, email, mailmessage.paid_subject, mailmessage.paid_content)
         elif self.status == ' REJECTED':
-            send_mail(self.name, mail, mailmessage.paid)
+            send_mail(self.name, email, mailmessage.denied_subject, mailmessage.denied_contenet)
 
         super(OnsiteTeam, self).save(*args, **kwargs)
 
 
 class MailMessage(models.Model):
-    paid = models.TextField(default='Paid')
-    reserved = models.TextField(default="Reserved registration beforehand")
-    pending = models.TextField(default="Pending")
-    approved = models.TextField(default="Approved for participation")
-    denied = models.TextField(default="Denied Participation")
+    paid_subject = models.TextField(default='Paid')
+    reserved_subject = models.TextField(default="Reserved registration beforehand")
+    pending_subject = models.TextField(default="Pending")
+    approved_subject = models.TextField(default="Approved for participation")
+    denied_subject = models.TextField(default="Denied Participation")
+
+    paid_content = models.TextField(default="")
+    reserved_content = models.TextField(default="")
+    pending_content = models.TextField(default="")
+    approved_content = models.TextField(default="")
+    denied_content = models.TextField(default="")
 
     @classmethod
     def load(cls):
