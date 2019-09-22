@@ -14,5 +14,4 @@ urlpatterns = [
     path('contests', ContestListView.as_view()),
     path('photos/<pk>', PhotoView.as_view()),
     path('current', CurrentContestView.as_view()),
-    
 ]
