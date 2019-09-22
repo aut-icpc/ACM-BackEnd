@@ -55,7 +55,7 @@ class CurrentContest(models.Model):
 class Gallery(RawGallery):
     # Photo title is the team name,
     # Photo caption is the members' name.
-    contest = models.ForeignKey(Contest, on_delete=models.CASCADE)    
+    contest = models.ForeignKey(Contest, on_delete=models.CASCADE, related_name='galleries')
 
     class Meta:
         verbose_name = 'Contest Gallery'
