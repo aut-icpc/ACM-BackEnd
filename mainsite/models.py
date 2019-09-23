@@ -1,6 +1,5 @@
 from django.db import models
 from django.core.validators import ValidationError
-from ckeditor.fields import RichTextField
 
 # Create your models here.
 
