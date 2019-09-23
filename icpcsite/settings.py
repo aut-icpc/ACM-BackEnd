@@ -45,7 +45,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'photologue',
     'sortedm2m',
-    'ckeditor',
+    # 'ckeditor',
 
     'contests',
     'mainsite',
