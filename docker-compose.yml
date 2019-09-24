@@ -1,8 +1,28 @@
-version: '3'
+version: "3.7"
 services:
   app:
     build: .
     ports:
       - 8000:8000
     environment:
-      -
+      - POSTGRES_DATABASE_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=***REMOVED***
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - SECRET_KEY=***REMOVED***
+      - EMAIL_HOST_USER=
+      - EMAIL_HOST_PASSWORD=
+    command: python manage.py runserver 0.0.0.0:8000
+  postgres:
+    image: postgres:11
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=***REMOVED***
+      - POSTGRES_DB=postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
