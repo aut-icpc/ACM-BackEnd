@@ -13,7 +13,7 @@ services:
       - SECRET_KEY=***REMOVED***
       - EMAIL_HOST_USER=
       - EMAIL_HOST_PASSWORD=
-    command: python manage.py runserver 0.0.0.0:8000
+#    command: python manage.py runserver 0.0.0.0:8000
   postgres:
     image: postgres:11
     environment:
