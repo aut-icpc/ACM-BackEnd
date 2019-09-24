@@ -13,4 +13,4 @@ ADD . /app
 
 EXPOSE 8000
 
-CMD ["gunicorn", "-w 3", "-b :8080", "acm:app"]
+CMD ["gunicorn", "-w 3", "-b :8080", "icpcsite:app"]
