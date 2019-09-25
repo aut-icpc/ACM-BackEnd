@@ -156,6 +156,8 @@ MEDIA_URL = '/images/'
 STATICFILES_DIRS = [
     MEDIA_ROOT.replace("\\", "/"),
     '/static/',
+    os.path.join(BASE_DIR, "static"),
+    '/var/www/static/',
 ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
