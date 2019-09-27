@@ -22,10 +22,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True if os.getenv('DEBUG_MODE') == 'True' else False
 
 ALLOWED_HOSTS = [
     'localhost',
+    os.getenv('RUNNING_HOST')
 ]
 
 
@@ -154,8 +155,8 @@ MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'images')
 MEDIA_URL = '/images/'
 
 STATICFILES_DIRS = [
-    MEDIA_ROOT.replace("\\", "/"),
-    '/static/',
+    MEDIA_ROOT,
+    'static/',
     os.path.join(BASE_DIR, "static"),
     '/var/www/static/',
 ]
