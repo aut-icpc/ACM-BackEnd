@@ -13,4 +13,4 @@ ADD . /app
 
 EXPOSE 8000
 
-CMD ["gunicorn", "-w 3", "-b :8080", "icpcsite.wsgi"]
+CMD ["gunicorn", "-w 3", "-b :8000", "icpcsite.wsgi"]
