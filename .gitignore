@@ -1,6 +1,6 @@
-*.json
+.idea/
+.vscode/
 *.sqlite3
-icpcsite/settings.py
 *.pyc
 */__pycache__
-*.env
+.env
