@@ -17,8 +17,8 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - type: bind
-        source: /app/static
-        target: /var/www/static
+        source: /var/www/static
+        target: /app/static
     networks:
       - production-net
 
