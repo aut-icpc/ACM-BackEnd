@@ -78,7 +78,7 @@ class PhotoAdmin(RawPhotoAdmin):
     def upload_zip(self, request):
 
         context = {
-            'title': _('Upload a zip archive of photos'),
+            'title': ('Upload a zip archive of photos'),
             'app_label': self.model._meta.app_label,
             'opts': self.model._meta,
             'has_change_permission': self.has_change_permission(request)

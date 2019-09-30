@@ -36,6 +36,12 @@ class UploadZipForm(RawUploadZipForm):
     thumbnail_size = forms.ModelChoiceField(PhotoSize.objects.all(),
                                      label=_('PhotoSize'),
                                      required=True)
+    gallery = forms.ModelChoiceField(Gallery.objects.all(),
+                                     label=_('Gallery'),
+                                     required=False,
+                                     help_text=_('Select a gallery to add these images to. Leave this empty to '
+                                                 'create a new gallery from the supplied title.'))
+
 
     def save(self, request=None, zip_file=None):
         if not zip_file:
