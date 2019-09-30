@@ -15,7 +15,7 @@ class PhotoSerializer(serializers.ModelSerializer):
         depth = 1
 
     def get_src(self, obj):
-        return os.path.join(settings.STATIC_URL, obj.image.name)
+        return os.path.join(settings.MEDIA_URL, obj.image.name)
 
 
 class GallerySerializer(serializers.ModelSerializer):

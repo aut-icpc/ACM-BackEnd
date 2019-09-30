@@ -25,7 +25,6 @@ logger = logging.getLogger('contests.forms')
 def save_photo(filename, contentfile, photo, gallery):
     current_site = Site.objects.get(id=settings.SITE_ID)
     photo.image.save(filename, contentfile)
-    print(photo.image.__dict__)
     photo.save()
     photo.set_thumbnail_url()
     photo.sites.add(current_site)
@@ -162,10 +161,6 @@ class PhotoAdminForm(RawPhotoAdminForm):
                                              is_public=self.cleaned_data['is_public'])
         image = self.cleaned_data['image']
         filename = image.name
-        ## Could it work here?
-        print("HOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO")
-        print(image.__dict__)
-     
         photo_title = self.cleaned_data['title'] if self.cleaned_data['title'] else gallery.title
 
         slug = slugify(photo_title)

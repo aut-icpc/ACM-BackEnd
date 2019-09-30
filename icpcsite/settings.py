@@ -143,7 +143,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
 ## Should be uncommented in production!
@@ -151,15 +151,15 @@ STATIC_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static')
 #     os.getenv('WHITELIST'),
 # ]
 
-MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'images')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'images')
 MEDIA_URL = '/images/'
 
-STATICFILES_DIRS = [
-    MEDIA_ROOT,
-    'static/',
-    os.path.join(BASE_DIR, "static"),
-    '/var/www/static/',
-]
+# STATICFILES_DIRS = [
+#     MEDIA_ROOT,
+#     'static/',
+#     os.path.join(BASE_DIR, "static"),
+#     '/var/www/static/',
+# ]
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
