@@ -17,12 +17,14 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.conf.urls import url
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('mainsite.api.urls')),
     path('api/', include('usermanagement.api.urls')),
-    path('api/', include('contests.api.urls'))
-
+    path('api/', include('contests.api.urls')),
+    url(r'^photologue/', include('photologue.urls', namespace='photologue')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
 # ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 
+# 

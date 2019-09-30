@@ -17,6 +17,7 @@ services:
       - EMAIL_HOST_PASSWORD=
     volumes:
       - ./static:/app/static
+      - ./images:/app/images
   webserver:
     image: nginx:1.17.1
     ports:
@@ -24,6 +25,7 @@ services:
     volumes:
       - ./.nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
       - ./static:/var/www/static
+      - ./images:/var/www/images
   database:
     image: postgres:11
     environment:

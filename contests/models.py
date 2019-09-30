@@ -89,6 +89,9 @@ class Photo(RawPhoto):
 
         return self.thumbnail_url
 
+    def get_absolute_url(self):
+        return os.path.join(settings.MEDIA_URL, self.image.name)
+
     def pre_cache(self):
         photosize = self.thumbnail_size
         if photosize.pre_cache:
