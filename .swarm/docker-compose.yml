@@ -19,6 +19,9 @@ services:
       - type: bind
         source: /var/www/static
         target: /app/static
+      - type: bind
+        source: /var/www/images
+        target: /app/images
     networks:
       - production-net
 
