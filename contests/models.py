@@ -9,6 +9,8 @@ from collections import OrderedDict
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 import os
+import logging
+
 
 
 class Contest (models.Model):
@@ -31,13 +33,17 @@ def get_latest_contest():
 
 class CurrentContest(models.Model):
     main = models.ForeignKey(Contest, on_delete=models.SET('get_latest_contest'))
-
+    sponsor = models.ImageField()
     class Meta:
         verbose_name_plural = 'Current Contest'
 
     @property
     def get_current_poster(self):
-        return settings.STATIC_URL + self.main.poster.name
+        return settings.MEDIA_URL + self.main.poster.name
+
+    @property
+    def get_sponsor(self):
+        return settings.MEDIA_URL + self.sponsor.name
 
     @classmethod
     def load(cls):
@@ -61,8 +67,13 @@ class Gallery(RawGallery):
         verbose_name = 'Contest Gallery'
         verbose_name_plural = 'Contest Galleries'
 
-    def __str__(self):
-        return 'ACM ' + self.contest.year + ' ' + self.title
+    # def __str__(self):
+    #     return 'ACM ' + self.contest.year + ' ' + self.title
+
+    def save(self, *args, **kwargs):
+        self.title += '-' + self.contest.year
+        self.slug += '-' + self.contest.year
+        super(Gallery, self).save(*args, **kwargs)
 
 
 class Photo(RawPhoto):

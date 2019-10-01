@@ -53,6 +53,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('main', models.ForeignKey(on_delete=models.SET('get_latest_contest'), to='contests.Contest')),
+                ('sponsor', models.ImageField(upload_to='')),
             ],
             options={
                 'verbose_name_plural': 'Current Contest',

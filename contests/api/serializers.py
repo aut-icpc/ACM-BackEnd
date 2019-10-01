@@ -44,7 +44,8 @@ class ContestGalleriesSerializer(serializers.ModelSerializer):
 class CurrentContestSerializer(serializers.ModelSerializer):
     poster = serializers.ReadOnlyField(source='get_current_poster')
     year = serializers.ReadOnlyField(source='main.year')
+    sponsor = serializers.ReadOnlyField(source='get_sponsor')
 
     class Meta:
         model = CurrentContest
-        fields = ['poster', 'year']
+        fields = ['poster', 'year', 'sponsor']
