@@ -9,12 +9,10 @@ from usermanagement.models import (
     Team,
     MailMessage
 )
-from ..utils import send_mail
 
 contestant_fields = ['first_name', 'last_name', 'gender', 'edu_level', 'student_number', 'email', 'phone_number']
 team_fields = ['name', 'status', 'institution', 'contestants']
 
-mail_parts = MailMessage.load()
 
 class OnsiteContestantSerializer(serializers.ModelSerializer):
     class Meta:
@@ -37,11 +35,14 @@ class CountrySerializer(serializers.ModelSerializer):
 
 def createContestants(validated_data, TeamType, ContestantType):
     contestants_data = validated_data.pop('contestants')
-    team = TeamType.objects.create(**validated_data)
     email = contestants_data[0]['email']
+    # team = TeamType.objects.create(**validated_data)
+    team = TeamType(**validated_data)
+    team.email = email
+    team.save()
     for contestant_data in contestants_data:
         ContestantType.objects.create(team=team, **contestant_data)
-    return team, email
+    return team
 
 
 class OnsiteTeamSerializer(serializers.ModelSerializer):
@@ -52,8 +53,7 @@ class OnsiteTeamSerializer(serializers.ModelSerializer):
         fields = team_fields
 
     def create(self, validated_data):
-        team, email = createContestants(validated_data, OnsiteTeam, OnsiteContestant)
-        send_mail(team.name, email, mail_parts.pending_subject, mail_parts.pending_content)
+        team = createContestants(validated_data, OnsiteTeam, OnsiteContestant)
         return team
 
 
@@ -65,9 +65,8 @@ class OnlineTeamSerializer(serializers.ModelSerializer):
         fields = team_fields + ['country']
 
     def create(self, validated_data):
-        team, email = createContestants(validated_data, OnlineTeam, OnlineContestant)
-        #Online team is accepted by default, unless something changes. 
-        send_mail(team.name, email, mail_parts.approved_subject, mail_parts.approved_content)
+        team = createContestants(validated_data, OnlineTeam, OnlineContestant)
+        
         return team
 
 

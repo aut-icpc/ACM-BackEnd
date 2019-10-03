@@ -48,38 +48,6 @@ class Country(models.Model):
         return self.name
 
 
-class Team(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    institution = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.name
-    
-class OnlineTeam(Team):
-    country = models.ForeignKey(Country, on_delete=models.CASCADE)
-    status = models.CharField(max_length=50, choices=ONLINE_TEAM_STATUS_CHOICES, default='PENDING')
-
-
-class OnsiteTeam(Team):
-    status = models.CharField(max_length=50, choices=ONSITE_TEAM_STATUS_CHOICES, default="PENDING")
-
-    def save(self, *args, **kwargs):
-
-        email = OnsiteContestant.objects.filter(team=self.pk)[0].email
-        mailmessage = MailMessage.load()
-
-        if self.status == 'RESERVED':
-            send_mail(self.name, email, mailmessage.reserved_subject, mailmessage.reserved_contenet)
-        elif self.status == 'APPROVED':
-            send_mail(self.name, email, mailmessage.approved_subject, mailmessage.approved_content)
-        elif self.status == 'PAID':
-            send_mail(self.name, email, mailmessage.paid_subject, mailmessage.paid_content)
-        elif self.status == ' REJECTED':
-            send_mail(self.name, email, mailmessage.denied_subject, mailmessage.denied_contenet)
-
-        super(OnsiteTeam, self).save(*args, **kwargs)
-
-
 class MailMessage(models.Model):
     paid_subject = models.TextField(default='Paid')
     reserved_subject = models.TextField(default="Reserved registration beforehand")
@@ -104,6 +72,54 @@ class MailMessage(models.Model):
 
     def delete(self, *args, **kwargs):
         pass
+
+
+class Team(models.Model):
+    name = models.CharField(max_length=255, unique=True)
+    institution = models.CharField(max_length=255)
+
+    email = ""
+
+    def __str__(self):
+        return self.name
+
+        
+    
+class OnlineTeam(Team):
+    country = models.ForeignKey(Country, on_delete=models.CASCADE)
+    status = models.CharField(max_length=50, choices=ONLINE_TEAM_STATUS_CHOICES, default='APPROVED')
+
+    def save(self, *args, **kwargs):
+        mailmessage = MailMessage.load()
+        #Online team is accepted by default, unless something changes. 
+        send_mail(self.name, self.email, mailmessage.approved_subject, mailmessage.approved_content)
+        super(OnlineTeam, self).save(*args, **kwargs)
+
+
+class OnsiteTeam(Team):
+    status = models.CharField(max_length=50, choices=ONSITE_TEAM_STATUS_CHOICES, default="PENDING")
+
+    def save(self, *args, **kwargs):
+
+        mailmessage = MailMessage.load()
+        email = self.email
+        name = self.name
+
+        if self.status == 'PENDING':
+            send_mail(name, email, mailmessage.pending_subject, mailmessage.pending_content)
+        elif self.status == 'RESERVED':
+            send_mail(name, email, mailmessage.reserved_subject, mailmessage.reserved_content)
+        elif self.status == 'APPROVED':
+            send_mail(name, email, mailmessage.approved_subject, mailmessage.approved_content)
+        elif self.status == 'PAID':
+            send_mail(name, email, mailmessage.paid_subject, mailmessage.paid_content)
+        elif self.status == ' REJECTED':
+            send_mail(name, email, mailmessage.denied_subject, mailmessage.denied_content)
+
+        super(OnsiteTeam, self).save(*args, **kwargs)
+
+
+
 
 
 class Contestant(models.Model):
