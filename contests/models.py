@@ -19,6 +19,7 @@ class Contest (models.Model):
     final_ranking_onsite = models.CharField(max_length=500)
     final_ranking_online = models.CharField(max_length=500)
     poster = models.ImageField(verbose_name='poster')
+    has_passed = models.BooleanField(default=True)
 
     def __str__(self):
         return 'ACM ' + str(self.year)

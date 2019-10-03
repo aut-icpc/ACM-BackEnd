@@ -30,7 +30,7 @@ class GallerySerializer(serializers.ModelSerializer):
 class ContestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contest
-        fields = ['year', 'problems', 'final_ranking_onsite', 'final_ranking_online', 'poster']
+        fields = ['year', 'problems', 'final_ranking_onsite', 'final_ranking_online', 'poster', 'has_passed']
 
 
 class ContestGalleriesSerializer(serializers.ModelSerializer):
