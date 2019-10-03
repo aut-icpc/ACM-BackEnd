@@ -36,8 +36,8 @@ class ContestRetrieveView(RetrieveAPIView):
 
 
 class ContestListView(ListAPIView):
-    queryset = Contest.objects.all()
-    # queryset = Contest.objects.filter()
+    # queryset = Contest.objects.all()
+    queryset = Contest.objects.filter(has_passed=True)
     serializer_class = ContestSerializer
 
 
