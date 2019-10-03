@@ -1,7 +1,8 @@
 from django.core.mail import send_mail as sendMail
 from django.conf import settings
-from rest_framework.renderers import JSONRenderer
 import json
+from io import BytesIO
+from django.http import FileResponse
 
 
 
@@ -21,37 +22,39 @@ def export_teams(adminType):
     from .admin import OnlineTeamAdmin, OnsiteTeamAdmin
     from .api.serializers import OnlineTeamListSerializer, OnsiteTeamListSerializer
     from .models import OnlineTeam, OnsiteTeam
+
     if adminType is OnlineTeamAdmin:
         team_class = OnlineTeam
         serializer_class = OnlineTeamListSerializer
     elif adminType is OnsiteTeamAdmin:
         team_class = OnsiteTeam
         serializer_class = OnsiteTeamListSerializer
+    
     teams = team_class.objects.all()
     serializer = serializer_class(teams, many=True)
-    # content = JSONRenderer().render(serializer.data)
     return serializer.data
 
-
-def write_json_to_csv_file(json_obj, file_name):
-    # Because somehow rest_framework returns the orderedDict inside of a list, why?!
+# Separator is either comma or a tab character
+def json_to_sv_file_response(json_obj, file_name, separator):
 
     # Keep track of headers in a set
     headers = json_obj[0].keys()
 
     # You only know what headers were there once you have read all the JSON once.
     # Now we have all the information we need, like what all possible headers are.
-
-    with open(file_name, 'w') as outfile:
-    # write headers to the file in order
-        outfile.write(",".join(headers) + '\n')
-
-        for record in json_obj:
-            # write each record based on available fields
-            curLine = []
-            for header in headers:
-                if header in record.keys():
-                    curLine.append(record[header])
-                else:
-                    curLine.append('')
-            outfile.write(",".join(curLine) + '\n')
+    
+    sv_str = separator.join(headers) + '\n'
+    for record in json_obj:
+        currentLine = []
+        for header in headers:
+            if header in record.keys():
+                currentLine.append(record[header])
+            else:
+                currentLine.append('')
+            sv_str += separator.join(currentLine, '\n')
+    
+    sv_bytes = str.encode(sv_str, encoding='utf-8')
+    sv_bytesIO = BytesIO(sv_bytes)
+    response = FileResponse(sv_bytesIO)
+    response['Content-Disposition'] = 'attachment; filename= %s' %file_name
+    return response

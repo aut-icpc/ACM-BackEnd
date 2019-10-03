@@ -5,7 +5,7 @@ from .models import (
     OnlineTeam,
 )
 from django.http import HttpResponseServerError, FileResponse
-from .utils import export_teams, write_json_to_csv_file
+from .utils import export_teams, json_to_sv_file_response
 import json
 import io
 
@@ -33,7 +33,8 @@ class OnsiteTeamForm(TeamForm):
 
 EXPORT_CHOICES = (
     ('JSON', 'JSON'),
-    ('CSV', 'CSV')
+    ('CSV', 'CSV'),
+    ('TSV', 'TSV')
 )
 
 class ExportTeamForm(forms.Form):
@@ -43,30 +44,23 @@ class ExportTeamForm(forms.Form):
         
         teams_json = export_teams(classType)
         file_name = classType.__name__[:-5]
-        test = 1 
         exp_type = self.data['export_type']
+
         if exp_type == 'JSON':
             file_name += ".json"
-            test = 2
             json_bytes = json.dumps(teams_json).encode('utf-8')
             json_bytesIO = io.BytesIO(json_bytes)
             response = FileResponse(json_bytesIO)
-            # response['Content-Type'] = 'application/json'
             response['Content-Disposition'] = 'attachment; filename= %s' %file_name
             return response
            
         elif exp_type == 'CSV':
             file_name += '.csv'
-            test = 3
-            write_json_to_csv_file(teams_json, file_name)
-            return FileResponse(open(file_name, 'rb'))
-
-
-        # return HttpResponseNotFound("not found m8")
+            return json_to_sv_file_response(teams_json, file_name, ',')
         
-        
-# with open("data.json", "w", encoding="utf-8") as file:
-#     json.dump(database.data, file, ensure_ascii=False, separators=(",\n", ": "), sort_keys=True)
+        elif exp_type == 'TSV':
+            file_name += '.tsv'
+            return json_to_sv_file_response(teams_json, file_name, '\t')
 
-
+        return HttpResponseServerError
 
