@@ -25,6 +25,7 @@ urlpatterns = [
     path('api/', include('usermanagement.api.urls')),
     path('api/', include('contests.api.urls')),
     url(r'^photologue/', include('photologue.urls', namespace='photologue')),
+    url(r'^admin_tools', include('admin_tools.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 
 # ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) 
 # 

@@ -7,12 +7,14 @@ from usermanagement.models import (
     OnlineContestant,
     OnsiteContestant,
     Team,
+    MailMessage
 )
 from ..utils import send_mail
 
 contestant_fields = ['first_name', 'last_name', 'gender', 'edu_level', 'student_number', 'email', 'phone_number']
 team_fields = ['name', 'status', 'institution', 'contestants']
 
+mail_parts = MailMessage.load()
 
 class OnsiteContestantSerializer(serializers.ModelSerializer):
     class Meta:
@@ -50,7 +52,7 @@ class OnsiteTeamSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         team, email = createContestants(validated_data, OnsiteTeam, OnsiteContestant)
-        send_mail(team.name, email, 'Create Onsite Contestant')
+        send_mail(team.name, email, mail_parts.pending_subject, mail_parts.pending_content)
         return team
 
 
@@ -63,7 +65,8 @@ class OnlineTeamSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         team, email = createContestants(validated_data, OnlineTeam, OnlineContestant)
-        send_mail(team.name, email, 'Create Online Contestant')
+        #Online team is accepted by default, unless something changes. 
+        send_mail(team.name, email, mail_parts.approved_subject, mail_parts.approved_content)
         return team
 
 

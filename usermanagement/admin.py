@@ -1,6 +1,7 @@
 from django.contrib import admin
-from django import forms
-from django.core.exceptions import ValidationError
+from django.conf.urls import url
+from django.shortcuts import render
+from django.contrib.admin import helpers
 from .models import (
     OnlineTeam,
     OnsiteTeam,
@@ -11,31 +12,62 @@ from .models import (
     MailMessage
 )
 
+from .forms import (
+    OnlineTeamForm,
+    OnsiteTeamForm,
+    ExportTeamForm,
+)
+
+from .api.serializers import (
+    OnlineTeamListSerializer,
+    OnsiteTeamListSerializer
+)
+
 # Register your models here.
 
-class TeamForm(forms.ModelForm): 
-    def clean(self):
-        contestant = self.cleaned_data.get('contestant')
-        if contestant.count() > 3:
-            raise ValidationError("Too many contestants in one team")
-        return self.cleaned_data
+class TeamAdmin(admin.ModelAdmin):
+    change_list_template = 'change_list_onsite_team.html'
 
-class OnlineTeamForm(TeamForm):
-    list_display = ('name', 'country', 'institution')
-    class Meta:
-        model = OnlineTeam
-        fields = '__all__'
+    def get_urls(self):
+        urls = super(TeamAdmin, self).get_urls()
+        custom_urls = [
+            url(r'export_teams/$',
+            self.admin_site.admin_view(self.export_online_teams),
+            name='contests_export_teams')
+        ]
+        return custom_urls + urls
 
-class OnsiteTeamForm(TeamForm):
-    class Meta:
-        model = OnsiteTeam
-        fields = '__all__'
+    def export_online_teams(self, request):
+        context = {
+            'title': ('Export Onsite Teams'),
+            'app_label': self.model._meta.app_label,
+            'opts': self.model._meta,
+            'has_change_permission': self.has_change_permission(request)
+        }
+        if request.method == 'POST':
+            export_form = ExportTeamForm(request.POST)
+            if export_form.is_valid():
+                return export_form.save(request=request, classType=self.__class__)
+        else:
+            export_form = ExportTeamForm()
+        context['form'] = export_form
+        context['adminform'] = helpers.AdminForm(export_form,
+                                                 list([(None, {'fields': export_form.base_fields})]),
+                                                 {})
 
-class OnlineTeamAdmin(admin.ModelAdmin):
+        return render(request, 'select_export.html', context)
+
+
+
+class OnlineTeamAdmin(TeamAdmin):
     form = OnlineTeamForm
 
-class OnsiteTeamAdmin(admin.ModelAdmin):
+
+class OnsiteTeamAdmin(TeamAdmin):
     form = OnsiteTeamForm
+
+    
+
 
 
 admin.site.register(OnsiteTeam, OnsiteTeamAdmin)

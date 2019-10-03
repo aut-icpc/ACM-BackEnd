@@ -62,7 +62,7 @@ class GalleryAdmin(RawGalleryAdmin):
 
 class PhotoAdmin(RawPhotoAdmin):
 
-    change_list_template = 'change_list.html'
+    change_list_template = 'change_list_photo.html'
     form = PhotoAdminForm
     exclude = ['thumbnail_url', 'sites', 'src']
 
