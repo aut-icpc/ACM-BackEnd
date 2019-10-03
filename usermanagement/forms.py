@@ -7,6 +7,7 @@ from .models import (
 from django.http import HttpResponseServerError, FileResponse
 from .utils import export_teams, write_json_to_csv_file
 import json
+import io
 
 
 class TeamForm(forms.ModelForm): 
@@ -47,14 +48,20 @@ class ExportTeamForm(forms.Form):
         if exp_type == 'JSON':
             file_name += ".json"
             test = 2
-            with open(file_name, "w", encoding="utf-8") as file:
-                json.dump(teams_json, file, ensure_ascii=False, separators=(",\n", ": "))
+            json_bytes = json.dumps(teams_json).encode('utf-8')
+            json_bytesIO = io.BytesIO(json_bytes)
+            response = FileResponse(json_bytesIO)
+            # response['Content-Type'] = 'application/json'
+            response['Content-Disposition'] = 'attachment; filename= %s' %file_name
+            return response
+           
         elif exp_type == 'CSV':
             file_name += '.csv'
             test = 3
             write_json_to_csv_file(teams_json, file_name)
+            return FileResponse(open(file_name, 'rb'))
 
-        return FileResponse(open(file_name, 'rb'))
+
         # return HttpResponseNotFound("not found m8")
         
         
