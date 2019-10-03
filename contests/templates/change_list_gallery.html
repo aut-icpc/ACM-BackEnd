@@ -1,0 +1,13 @@
+{% extends "admin/change_list.html" %}
+{% load i18n %}
+
+
+{% block object-tools-items %}
+  {{ block.super }}
+  <li>
+    <a href="{% url "admin:contests_set_caption" %}" class="addlink">
+      {% trans "Set captions for gallery" %}
+    </a>
+  </li>
+{% endblock %}
+

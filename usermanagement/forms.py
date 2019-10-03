@@ -40,11 +40,11 @@ EXPORT_CHOICES = (
 class ExportTeamForm(forms.Form):
     export_type = forms.ChoiceField(choices=EXPORT_CHOICES)
 
-    def save(self, request=None, classType=None):
+    def save(self, classType=None):
         
         teams_json = export_teams(classType)
         file_name = classType.__name__[:-5]
-        exp_type = self.data['export_type']
+        exp_type = self.cleaned_data['export_type']
 
         if exp_type == 'JSON':
             file_name += ".json"

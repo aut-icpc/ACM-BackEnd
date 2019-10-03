@@ -26,7 +26,7 @@ from .api.serializers import (
 # Register your models here.
 
 class TeamAdmin(admin.ModelAdmin):
-    change_list_template = 'change_list_onsite_team.html'
+    change_list_template = 'change_list_team.html'
 
     def get_urls(self):
         urls = super(TeamAdmin, self).get_urls()
@@ -47,7 +47,7 @@ class TeamAdmin(admin.ModelAdmin):
         if request.method == 'POST':
             export_form = ExportTeamForm(request.POST)
             if export_form.is_valid():
-                return export_form.save(request=request, classType=self.__class__)
+                return export_form.save(classType=self.__class__)
         else:
             export_form = ExportTeamForm()
         context['form'] = export_form

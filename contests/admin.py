@@ -4,7 +4,7 @@ from .models import Contest, Gallery, Photo, CurrentContest
 from photologue.models import Photo as RawPhoto
 from photologue.admin import GalleryAdmin as RawGalleryAdmin, PhotoAdmin as RawPhotoAdmin, PhotoAdminForm as RawPhotoAdminForm
 from django import forms
-from .forms import PhotoAdminForm, UploadZipForm
+from .forms import PhotoAdminForm, UploadZipForm, SetCaptionForm
 import logging
 from django.conf.urls import url
 from django.http import HttpResponseRedirect
@@ -57,7 +57,39 @@ class GalleryAdminForm(forms.ModelForm):
 
 class GalleryAdmin(RawGalleryAdmin):
     list_display = ('contest', 'title', 'date_added', 'photo_count', 'is_public')
+    change_list_template = 'change_list_gallery.html'
     form = GalleryAdminForm
+
+    def get_urls(self):
+        urls = super(GalleryAdmin, self).get_urls()
+        custom_urls = [
+            url(r'^set_caption/$',
+                self.admin_site.admin_view(self.set_caption),
+                name='contests_set_caption')
+        ]
+        return custom_urls + urls
+
+    def set_caption(self, request):
+        context = {
+            'title': ('Add caption to a gallery'),
+            'app_label': self.model._meta.app_label,
+            'opts': self.model._meta,
+            'has_change_permission': self.has_change_permission(request)
+        }
+        if request.method == 'POST':
+            form = SetCaptionForm(request.POST, request.FILES)
+            if form.is_valid():
+                form.save()
+                return HttpResponseRedirect('..')
+        else:
+            form = SetCaptionForm()
+        context['form'] = form
+        context['adminform'] = helpers.AdminForm(form,
+                                                 list([(None, {'fields': form.base_fields})]),
+                                                 {})
+        return render(request, 'set_caption.html', context)
+
+        
 
 
 class PhotoAdmin(RawPhotoAdmin):

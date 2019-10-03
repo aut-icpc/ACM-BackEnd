@@ -31,7 +31,8 @@ class OnlineContestantSerializer(serializers.ModelSerializer):
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country 
-        fields = '__all__'
+        # fields = '__all__'
+        exclude = ('id', )
 
 
 def createContestants(validated_data, TeamType, ContestantType):
@@ -81,4 +82,5 @@ class OnlineTeamListSerializer(serializers.ModelSerializer):
 class OnsiteTeamListSerializer(serializers.ModelSerializer):
     class Meta:
         model = OnsiteTeam
-        fields = '__all__'
+        exclude = ('id', )
+        # fields = '__all__'

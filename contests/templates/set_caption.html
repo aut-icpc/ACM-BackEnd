@@ -20,7 +20,7 @@
 	    {{ form.non_field_errors }}
 	{% endif %}
 
-	<form action="{% url 'admin:contests_export_teams' %}" method="post" id="export-teams"
+	<form action="{% url 'admin:contests_set_caption' %}" method="post" id="set_caption"
           {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}>
         {% csrf_token %}
         <div>
@@ -29,7 +29,7 @@
             {% endfor %}
         </div>
         <div class="submit-row">
-            <input type="submit" value="{% trans 'Get Exported Teams' %}" class="default"/>
+            <input type="submit" value="{% trans 'Set captions' %}" class="default"/>
         </div>
     </form>
 

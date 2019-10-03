@@ -8,7 +8,8 @@ from mainsite.models import (
 class TimeLineItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = TimeLineItem
-        fields = '__all__'
+        exclude = ('id', )
+        # fields = '__all__'
 
 class CountdownSerializer(serializers.ModelSerializer):
     class Meta:

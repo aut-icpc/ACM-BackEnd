@@ -32,12 +32,12 @@ class ContestRetrieveView(RetrieveAPIView):
     def get_queryset(self):
         year = self.kwargs['year']
         queryset = Contest.objects.filter(year=year)
-        print(queryset)
         return queryset
 
 
 class ContestListView(ListAPIView):
     queryset = Contest.objects.all()
+    # queryset = Contest.objects.filter()
     serializer_class = ContestSerializer
 
 

@@ -180,3 +180,22 @@ class PhotoAdminForm(RawPhotoAdminForm):
         save_photo(filename, image.file, photo, gallery)
 
         return photo
+
+
+class SetCaptionForm(forms.Form):
+    gallery = forms.ModelChoiceField(Gallery.objects.all(), 
+                                    help_text='Select the gallery you want to add captions to',
+                                    required=True)
+    csv = forms.FileField()
+
+    def save(self):
+        gallery = self.cleaned_data['gallery']
+        csv_file = self.cleaned_data['csv']
+        csv_str = csv_file.read().decode('utf-8')
+        csv_parts = csv_str.replace('\n', '').split(',')
+
+        for photo in gallery.photos.all():
+            csv_part = csv_parts.pop(0)
+            photo.caption = csv_part
+            photo.save()
+

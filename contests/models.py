@@ -71,8 +71,11 @@ class Gallery(RawGallery):
     #     return 'ACM ' + self.contest.year + ' ' + self.title
 
     def save(self, *args, **kwargs):
-        self.title += '-' + self.contest.year
-        self.slug += '-' + self.contest.year
+        suffix = '-' + self.contest.year
+        if not self.title.endswith(suffix):
+            self.title += suffix
+        if not self.slug.endswith(suffix):
+            self.slug += '-' + suffix
         super(Gallery, self).save(*args, **kwargs)
 
 
