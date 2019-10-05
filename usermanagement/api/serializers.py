@@ -12,12 +12,13 @@ from usermanagement.models import (
 
 contestant_fields = ['first_name', 'last_name', 'gender', 'edu_level', 'student_number', 'email', 'phone_number']
 team_fields = ['name', 'status', 'institution', 'contestants']
+online_team_fields = team_fields + ['country']
 
 
 class OnsiteContestantSerializer(serializers.ModelSerializer):
     class Meta:
         model = OnsiteContestant
-        fields = contestant_fields
+        fields = contestant_fields + ['shirt_size']
 
 
 class OnlineContestantSerializer(serializers.ModelSerializer):
@@ -29,14 +30,12 @@ class OnlineContestantSerializer(serializers.ModelSerializer):
 class CountrySerializer(serializers.ModelSerializer):
     class Meta:
         model = Country 
-        # fields = '__all__'
         exclude = ('id', )
 
 
 def createContestants(validated_data, TeamType, ContestantType):
     contestants_data = validated_data.pop('contestants')
     email = contestants_data[0]['email']
-    # team = TeamType.objects.create(**validated_data)
     team = TeamType(**validated_data)
     team.email = email
     team.save()
@@ -62,24 +61,31 @@ class OnlineTeamSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OnlineTeam
-        fields = team_fields + ['country']
+        fields = online_team_fields
 
     def create(self, validated_data):
         team = createContestants(validated_data, OnlineTeam, OnlineContestant)
-        
         return team
-
 
 class OnlineTeamListSerializer(serializers.ModelSerializer):
     country = serializers.SlugRelatedField(slug_field='name', read_only=True)
 
     class Meta:
         model = OnlineTeam
-        fields = ['name', 'institution', 'status', 'country']
+        fields = online_team_fields
+
+
+class OnlineTeamListSerializerWithAuth(OnlineTeamListSerializer):
+    user = serializers.SerializerMethodField()
+    class Meta:
+        fields = online_team_fields + ['password', 'user']
+
+    def get_user(self, obj):
+        user = obj.contestants[0].email.replace("@", "")
+        return user
 
 
 class OnsiteTeamListSerializer(serializers.ModelSerializer):
     class Meta:
         model = OnsiteTeam
         exclude = ('id', )
-        # fields = '__all__'

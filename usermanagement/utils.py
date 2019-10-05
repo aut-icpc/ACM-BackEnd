@@ -20,12 +20,12 @@ def export_teams(adminType):
      # I seriously tried to avoid this bullcrap, but finally because of serializers there was no ducking conditions.
 
     from .admin import OnlineTeamAdmin, OnsiteTeamAdmin
-    from .api.serializers import OnlineTeamListSerializer, OnsiteTeamListSerializer
+    from .api.serializers import OnsiteTeamListSerializer, OnlineTeamListSerializerWithAuth
     from .models import OnlineTeam, OnsiteTeam
 
     if adminType is OnlineTeamAdmin:
         team_class = OnlineTeam
-        serializer_class = OnlineTeamListSerializer
+        serializer_class = OnlineTeamListSerializerWithAuth
     elif adminType is OnsiteTeamAdmin:
         team_class = OnsiteTeam
         serializer_class = OnsiteTeamListSerializer
