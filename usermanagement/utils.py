@@ -7,10 +7,12 @@ from django.http import FileResponse
 
 
 
-def send_mail(ContestantTeamName, ContestantEmail, MailMessageSubject, MailMessageContent):
+def send_mail(ContestantTeamName, ContestantEmail, MailMessageSubject, MailMessageContent, password=None):
 
     subject = MailMessageSubject
     message = MailMessageContent
+    if password:
+        message += "\n Your password is %s" % password
     email_from = settings.EMAIL_HOST_USER
     recipient_list = [ContestantEmail, ]   
     sendMail(subject, message, email_from, recipient_list)

@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.postgres import fields
-from django.core.validators import RegexValidator
+from django.core.validators import RegexValidator, EmailValidator
 from django.conf import settings
 from .utils import send_mail
 import uuid
@@ -91,15 +91,16 @@ class Team(models.Model):
     
 class OnlineTeam(Team):
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
-    status = models.CharField(max_length=50, choices=ONLINE_TEAM_STATUS_CHOICES, default='PAID')
+    status = models.CharField(max_length=50, choices=ONLINE_TEAM_STATUS_CHOICES, default='APPROVED')
     password = models.CharField(max_length=20)
 
     def save(self, *args, **kwargs):
         mailmessage = MailMessage.load()
         # Online team is accepted by default, unless something changes. 
-        send_mail(self.name, self.email, mailmessage.approved_subject, mailmessage.approved_content)
         self.password = uuid.uuid4().hex[:8]
         super(OnlineTeam, self).save(*args, **kwargs)
+        send_mail(self.name, self.email, mailmessage.approved_subject, mailmessage.approved_content)
+
 
 
 class OnsiteTeam(Team):
@@ -110,6 +111,8 @@ class OnsiteTeam(Team):
         mailmessage = MailMessage.load()
         email = self.email
         name = self.name
+
+        super(OnsiteTeam, self).save(*args, **kwargs)
 
         if self.status == 'PENDING':
             send_mail(name, email, mailmessage.pending_subject, mailmessage.pending_content)
@@ -122,18 +125,21 @@ class OnsiteTeam(Team):
         elif self.status == ' REJECTED':
             send_mail(name, email, mailmessage.denied_subject, mailmessage.denied_content)
 
-        super(OnsiteTeam, self).save(*args, **kwargs)
 
 
 
 class Contestant(models.Model):
+    phone_validator = RegexValidator(regex=r"^(\+98|0)?9\d{9}$", message="Phone number must be entered correctly.")
+    email_validator = EmailValidator(message="Email must be entered correctly.")
+
+
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
     gender = models.CharField(max_length=5, choices=GENDER_CHOICES)
     edu_level = models.CharField(max_length=3, choices=EDU_LEVEL_CHOICES, default='BSC')
     student_number = models.CharField(max_length=255)
-    email = models.CharField(max_length=255, unique=True)
-    phone_number = models.CharField(max_length=20, unique=True)
+    email = models.CharField(max_length=255, unique=True, validators=[email_validator])
+    phone_number = models.CharField(validators=[phone_validator], blank=True)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='contestants')
  
     def __str__(self):
