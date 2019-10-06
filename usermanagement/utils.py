@@ -5,16 +5,17 @@ from io import BytesIO
 from django.http import FileResponse
 
 
+def generate_user_from_email(email):
+    return email.replace("@", "")
 
+def send_mail(contestantTeamName, contestantEmail, mailMessageSubject, mailMessageContent, password=None):
 
-def send_mail(ContestantTeamName, ContestantEmail, MailMessageSubject, MailMessageContent, password=None):
-
-    subject = MailMessageSubject
-    message = MailMessageContent
+    subject = mailMessageSubject
+    message = mailMessageContent
     if password:
-        message += "\n Your password is %s" % password
+        message += "\n Your user is: %s \n Your password is %s" % (generate_user_from_email(contestantEmail), password)
     email_from = settings.EMAIL_HOST_USER
-    recipient_list = [ContestantEmail, ]   
+    recipient_list = [contestantEmail, ]   
     sendMail(subject, message, email_from, recipient_list)
 
 

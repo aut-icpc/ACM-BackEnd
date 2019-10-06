@@ -87,8 +87,10 @@ class Team(models.Model):
     def __str__(self):
         return self.name
 
-        
-    
+    def get_email(self):
+        return self.email or self.contestants.get(is_primary=True).email
+
+
 class OnlineTeam(Team):
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
     status = models.CharField(max_length=50, choices=ONLINE_TEAM_STATUS_CHOICES, default='APPROVED')
@@ -99,7 +101,8 @@ class OnlineTeam(Team):
         # Online team is accepted by default, unless something changes. 
         self.password = uuid.uuid4().hex[:8]
         super(OnlineTeam, self).save(*args, **kwargs)
-        send_mail(self.name, self.email, mailmessage.approved_subject, mailmessage.approved_content)
+        email = self.get_email()
+        send_mail(self.name, email, mailmessage.approved_subject, mailmessage.approved_content)
 
 
 
@@ -109,7 +112,7 @@ class OnsiteTeam(Team):
     def save(self, *args, **kwargs):
 
         mailmessage = MailMessage.load()
-        email = self.email
+        email = self.get_email()
         name = self.name
 
         super(OnsiteTeam, self).save(*args, **kwargs)
@@ -141,6 +144,7 @@ class Contestant(models.Model):
     email = models.CharField(max_length=255, unique=True, validators=[email_validator])
     phone_number = models.CharField(validators=[phone_validator], blank=True, max_length=20)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='contestants')
+    is_primary = models.BooleanField(default=False)
  
     def __str__(self):
         return self.first_name + " " + self.last_name

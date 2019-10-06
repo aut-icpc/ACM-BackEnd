@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.conf import settings
 from django.views.defaults import bad_request
+from ..utils import generate_user_from_email
 from usermanagement.models import (
     Country,
     OnlineTeam,
@@ -36,12 +37,18 @@ class CountrySerializer(serializers.ModelSerializer):
 
 def createContestants(validated_data, TeamType, ContestantType):
     contestants_data = validated_data.pop('contestants')
-    email = contestants_data[0]['email']
+    main_contestant_data = contestants_data[0]
+    
     team = TeamType(**validated_data)
-    team.email = email
+    team.email = main_contestant_data.email
     team.save()
-    for contestant_data in contestants_data:
+
+    main_contestant = ContestantType(**main_contestant_data)
+    main_contestant.is_primary = True
+    main_contestant.save()
+    for contestant_data in contestants_data[1:]:
         ContestantType.objects.create(team=team, **contestant_data)
+
     return team
 
 
@@ -83,7 +90,7 @@ class OnlineTeamListSerializerWithAuth(OnlineTeamListSerializer):
         fields = online_team_fields + ['password', 'user']
 
     def get_user(self, obj):
-        user = obj.contestants[0].email.replace("@", "")
+        user = generate_user_from_email(obj.contestants[0].email)
         return user
 
 
