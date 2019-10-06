@@ -4,6 +4,9 @@ from rest_framework.generics import (
     ListAPIView,
 )
 
+from django.db import IntegrityError
+from django.core.exceptions import SuspiciousOperation
+
 from usermanagement.models import (
     Country,
     OnlineTeam,
@@ -38,6 +41,18 @@ class OnlineTeamCreateView(CreateAPIView):
     queryset = OnlineTeam.objects.all()
     serializer_class = OnlineTeamSerializer
 
+    def create(self, request, *args, **kwargs):
+        try:
+            return super(OnlineTeamCreateView, self).create(request, *args, **kwargs)
+        except IntegrityError:
+            raise SuspiciousOperation
+
 class OnsiteTeamCreateView(CreateAPIView):
     queryset = OnsiteTeam.objects.all()
     serializer_class = OnsiteTeamSerializer
+
+    def create(self, request, *args, **kwargs):
+        try:
+            return super(OnsiteTeamCreateView, self).create(request, *args, **kwargs)
+        except IntegrityError:
+            raise SuspiciousOperation

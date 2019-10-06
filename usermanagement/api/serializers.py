@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from django.conf import settings
+from django.views.defaults import bad_request
 from usermanagement.models import (
     Country,
     OnlineTeam,
@@ -64,6 +65,7 @@ class OnlineTeamSerializer(serializers.ModelSerializer):
         fields = online_team_fields
 
     def create(self, validated_data):
+
         team = createContestants(validated_data, OnlineTeam, OnlineContestant)
         return team
 

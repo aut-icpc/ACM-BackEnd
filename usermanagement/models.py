@@ -55,14 +55,14 @@ class MailMessage(models.Model):
     pending_subject = models.TextField(default="Pending")
     approved_subject = models.TextField(default="Approved for participation")
     denied_subject = models.TextField(default="Denied Participation")
-    online_subject = models.TextField()
+    online_subject = models.TextField(default="")
 
     paid_content = models.TextField(default="")
     reserved_content = models.TextField(default="")
     pending_content = models.TextField(default="")
     approved_content = models.TextField(default="")
     denied_content = models.TextField(default="")
-    online_content = models.TextField()
+    online_content = models.TextField(default="")
 
 
     @classmethod
@@ -92,7 +92,7 @@ class Team(models.Model):
 class OnlineTeam(Team):
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
     status = models.CharField(max_length=50, choices=ONLINE_TEAM_STATUS_CHOICES, default='APPROVED')
-    password = models.CharField(max_length=20)
+    password = models.CharField(max_length=20, default="")
 
     def save(self, *args, **kwargs):
         mailmessage = MailMessage.load()
@@ -139,7 +139,7 @@ class Contestant(models.Model):
     edu_level = models.CharField(max_length=3, choices=EDU_LEVEL_CHOICES, default='BSC')
     student_number = models.CharField(max_length=255)
     email = models.CharField(max_length=255, unique=True, validators=[email_validator])
-    phone_number = models.CharField(validators=[phone_validator], blank=True)
+    phone_number = models.CharField(validators=[phone_validator], blank=True, max_length=20)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='contestants')
  
     def __str__(self):
