@@ -51,7 +51,6 @@ def createContestants(validated_data, TeamType, ContestantType):
 
     return team
 
-
 class OnsiteTeamSerializer(serializers.ModelSerializer):
     contestants = OnsiteContestantSerializer(many=True)
 
