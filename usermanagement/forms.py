@@ -16,7 +16,8 @@ class TeamForm(forms.ModelForm):
         try:
             if contestant.count() > 3:
                 raise ValidationError("Too many contestants in one team")
-        except AttributeError:
+        except AttributeError as ex:
+            print(ex)
             print("Adding teams through admin is kinda bad practice, kinda.")
         return self.cleaned_data
 
