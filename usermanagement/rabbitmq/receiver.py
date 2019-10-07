@@ -1,9 +1,9 @@
 import pika, json, datetime, time
-import init
+from . import startup
 from usermanagement.utils import send_mail as sendMail
 
 
-connection, channel = init.start()
+connection, channel = startup.start()
 
 # Using a class because a single global variable would cause problems with python in this case.
 # I've been using global variables my entire life and I still can't figure out why.
@@ -38,7 +38,7 @@ def send_email(ch, method, properties, body):
 
 
 channel.basic_consume(
-    queue = init.QUEUE_NAME,
+    queue = startup.QUEUE_NAME,
     on_message_callback = send_email,
     auto_ack = False
 )

@@ -1,15 +1,16 @@
 import pika, json
-import init
+from . import startup
 
-connection, channel = init.start()
+class Sender:
+    def __init__(self):
+        self.connection, self.channel = startup.start()
 
-def publish_mail(email_dict):
-    channel.basic_publish(
-        exchange = '',
-        routing_key = init.QUEUE_NAME,
-        body = json.dumps(email_dict),
-        properties= pika.BasicProperties(
-            delivery_mode=2
+    def publish_mail(self, email_dict):
+        self.channel.basic_publish(
+            exchange = '',
+            routing_key = startup.QUEUE_NAME,
+            body = json.dumps(email_dict),
+            properties= pika.BasicProperties(
+                delivery_mode=2
+            )
         )
-    )
-

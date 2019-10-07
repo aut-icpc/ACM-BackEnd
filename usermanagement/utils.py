@@ -8,6 +8,16 @@ from django.http import FileResponse
 def generate_user_from_email(email):
     return email.replace("@", "")
 
+def generate_email_json(contestantTeamName, contestantEmail, mailMessageSubject, mailMessageContent, password=None):
+    email_json = {
+        'contestantTeamName': contestantTeamName,
+        "contestantEmail": contestantEmail,
+        "mailMessageSubject": mailMessageSubject,
+        "mailMessageContent": mailMessageSubject,
+        "password": password
+    }
+    return email_json
+
 def send_mail(contestantTeamName, contestantEmail, mailMessageSubject, mailMessageContent, password=None):
 
     subject = mailMessageSubject
@@ -15,7 +25,7 @@ def send_mail(contestantTeamName, contestantEmail, mailMessageSubject, mailMessa
     if password:
         message += "\n Your user is: %s \n Your password is %s" % (generate_user_from_email(contestantEmail), password)
     email_from = settings.EMAIL_HOST_USER
-    recipient_list = [contestantEmail, ]   
+    recipient_list = [contestantEmail, ]
     sendMail(subject, message, email_from, recipient_list)
 
 
