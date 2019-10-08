@@ -1,4 +1,9 @@
 version: "3.7"
+
+networks: 
+  app-tier:
+    driver: bridge
+
 services:
   app:
     build: .
@@ -15,9 +20,13 @@ services:
       - SECRET_KEY=***REMOVED***
       - EMAIL_HOST_USER=
       - EMAIL_HOST_PASSWORD=
+      - RABBIT_HOST = rabbit
     volumes:
       - ./static:/app/static
       - ./images:/app/images
+    networks: 
+      - app-tier
+
   webserver:
     image: nginx:1.17.1
     ports:
@@ -36,5 +45,23 @@ services:
       - 5432:5432
     volumes:
       - pgdata:/var/lib/postgresql/data
+  rabbitmq:
+    hostname: rabbit
+    image: rabbitmq:management
+    ports: 
+      # - "4369:4369"
+      - "5671:5671"
+      - "5672:5672"
+      - "25672:25672"
+      - "15671:15671"
+      - "15672:15672"
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:15672"]
+        interval: 30s
+        timeout: 10s
+        retries: 5
+    networks: 
+      - app-tier
+
 volumes:
   pgdata:

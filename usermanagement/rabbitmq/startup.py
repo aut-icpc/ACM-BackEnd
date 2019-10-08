@@ -1,10 +1,12 @@
 import pika
+import os
 QUEUE_NAME = 'mail_queue'
 
 def start():
     connection = pika.BlockingConnection(
         pika.ConnectionParameters(
-            host='localhost'
+            host=os.getenv("RABBIT_HOST")
+            # host='localhost'
         )
     )
 

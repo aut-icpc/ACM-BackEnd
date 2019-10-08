@@ -66,7 +66,6 @@ class MailMessage(models.Model):
     denied_content = models.TextField(default="")
     online_content = models.TextField(default="")
 
-
     @classmethod
     def load(cls):
         obj, created = cls.objects.get_or_create(pk=1)
@@ -81,8 +80,8 @@ class MailMessage(models.Model):
 
 
 class Team(models.Model):
-    name = models.CharField(max_length=255, unique=True)
-    institution = models.CharField(max_length=255)
+    name = models.CharField(max_length=25, unique=True)
+    institution = models.CharField(max_length=25)
 
     email = ""
 
@@ -92,10 +91,9 @@ class Team(models.Model):
     def get_email(self):
         return self.email or self.contestants.get(is_primary=True).email
 
-
 class OnlineTeam(Team):
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
-    status = models.CharField(max_length=50, choices=ONLINE_TEAM_STATUS_CHOICES, default='APPROVED')
+    status = models.CharField(max_length=20, choices=ONLINE_TEAM_STATUS_CHOICES, default='APPROVED')
     password = models.CharField(max_length=20, default="")
 
     def save(self, *args, **kwargs):
@@ -106,7 +104,6 @@ class OnlineTeam(Team):
         email = self.get_email()
         mail_json = generate_email_json(self.name, email, mailmessage.approved_subject, mailmessage.approved_content, self.password)
         sender.publish_mail(mail_json)
-
 
 
 class OnsiteTeam(Team):
@@ -137,19 +134,16 @@ class OnsiteTeam(Team):
             sender.publish_mail(mail_json)
 
 
-
-
 class Contestant(models.Model):
     phone_validator = RegexValidator(regex=r"^(\+98|0)?9\d{9}$", message="Phone number must be entered correctly.")
     email_validator = EmailValidator(message="Email must be entered correctly.")
 
-
-    first_name = models.CharField(max_length=255)
-    last_name = models.CharField(max_length=255)
+    first_name = models.CharField(max_length=30)
+    last_name = models.CharField(max_length=50)
     gender = models.CharField(max_length=5, choices=GENDER_CHOICES)
     edu_level = models.CharField(max_length=3, choices=EDU_LEVEL_CHOICES, default='BSC')
-    student_number = models.CharField(max_length=255)
-    email = models.CharField(max_length=255, unique=True, validators=[email_validator])
+    student_number = models.CharField(max_length=20)
+    email = models.CharField(max_length=100, unique=True, validators=[email_validator])
     phone_number = models.CharField(validators=[phone_validator], blank=True, max_length=20)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='contestants')
     is_primary = models.BooleanField(default=False)
@@ -159,7 +153,6 @@ class Contestant(models.Model):
 
 class OnlineContestant(Contestant):
     pass
-
 
 class OnsiteContestant(Contestant):
     shirt_size = models.CharField(max_length=20, choices=T_SHIRT_SIZE_CHOICES, default='M')
