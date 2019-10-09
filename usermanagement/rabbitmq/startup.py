@@ -1,6 +1,8 @@
 import pika
 import os
-QUEUE_NAME = 'mail_queue'
+
+QUEUE_NAME = os.environ['MAIL_QUEUE']
+
 
 def start():
     connection = pika.BlockingConnection(
@@ -9,12 +11,7 @@ def start():
             # host='localhost'
         )
     )
-
     channel = connection.channel()
     channel.queue_declare(queue=QUEUE_NAME, durable=True)
 
     return connection, channel
-
-
-def close_connection(connection):
-    connection.close()

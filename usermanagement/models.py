@@ -38,7 +38,7 @@ ONSITE_TEAM_STATUS_CHOICES = (
 
 ONLINE_TEAM_STATUS_CHOICES = () + TEAM_STATUS_CHOICES
 
-sender = Sender()
+sender = None
 
 class Country(models.Model):
     name = models.CharField(max_length=255)
@@ -103,6 +103,8 @@ class OnlineTeam(Team):
         super(OnlineTeam, self).save(*args, **kwargs)
         email = self.get_email()
         mail_json = generate_email_json(self.name, email, mailmessage.approved_subject, mailmessage.approved_content, self.password)
+        if not sender:
+            sender = Sender()
         sender.publish_mail(mail_json)
 
 
@@ -116,6 +118,9 @@ class OnsiteTeam(Team):
         name = self.name
 
         super(OnsiteTeam, self).save(*args, **kwargs)
+
+        if not sender:
+            sender = Sender()
 
         if self.status == 'PENDING':
            mail_json = generate_email_json(name, email, mailmessage.pending_subject, mailmessage.pending_content)
