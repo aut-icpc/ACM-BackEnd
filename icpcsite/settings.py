@@ -27,7 +27,7 @@ DEBUG = True if os.getenv('DEBUG_MODE') == 'True' else False
 ALLOWED_HOSTS = [
     'localhost',
     os.getenv('RUNNING_HOST'),
-    os.getenv('API_HOST')
+    'api.icpc.aut.ac.ir'
 ]
 
 
