@@ -2,9 +2,9 @@ from django.db import models
 from django.contrib.postgres import fields
 from django.core.validators import RegexValidator, EmailValidator
 from django.conf import settings
-from .utils import generate_email_json
+from .utils import generate_email_json, send_mail
 import uuid
-from usermanagement.rabbitmq.sender import Sender
+# from usermanagement.rabbitmq.sender import Sender
 
 EDU_LEVEL_CHOICES = (
     ('BSC', 'BSc'),
@@ -38,7 +38,7 @@ ONSITE_TEAM_STATUS_CHOICES = (
 
 ONLINE_TEAM_STATUS_CHOICES = () + TEAM_STATUS_CHOICES
 
-sender = None
+# sender = None
 
 class Country(models.Model):
     name = models.CharField(max_length=255)
@@ -102,10 +102,11 @@ class OnlineTeam(Team):
         self.password = uuid.uuid4().hex[:8]
         super(OnlineTeam, self).save(*args, **kwargs)
         email = self.get_email()
-        mail_json = generate_email_json(self.name, email, mailmessage.approved_subject, mailmessage.approved_content, self.password)
-        if not sender:
-            sender = Sender()
-        sender.publish_mail(mail_json)
+        # mail_json = generate_email_json(self.name, email, mailmessage.approved_subject, mailmessage.approved_content, self.password)
+        # if not sender:
+        #     sender = Sender()
+        send_mail(self.name, email, mailmessage.approved_subject, mailmessage.approved_content, self.password)
+        # sender.publish_mail(mail_json)
 
 
 class OnsiteTeam(Team):
@@ -119,24 +120,25 @@ class OnsiteTeam(Team):
 
         super(OnsiteTeam, self).save(*args, **kwargs)
 
-        if not sender:
-            sender = Sender()
+        # if not sender:
+        #     sender = Sender()
 
         if self.status == 'PENDING':
-           mail_json = generate_email_json(name, email, mailmessage.pending_subject, mailmessage.pending_content)
-           sender.publish_mail(mail_json)
-        elif self.status == 'RESERVED':
-            mail_json = generate_email_json(name, email, mailmessage.reserved_subject, mailmessage.reserved_content)
-            sender.publish_mail(mail_json)
-        elif self.status == 'APPROVED':
-            mail_json = generate_email_json(name, email, mailmessage.approved_subject, mailmessage.approved_content)
-            sender.publish_mail(mail_json)
-        elif self.status == 'PAID':
-            mail_json = generate_email_json(name, email, mailmessage.paid_subject, mailmessage.paid_content)
-            sender.publish_mail(mail_json)
-        elif self.status == ' REJECTED':
-            mail_json = generate_email_json(name, email, mailmessage.denied_subject, mailmessage.denied_content)
-            sender.publish_mail(mail_json)
+            send_mail(name, email, mailmessage.pending_subject, mailmessage.pending_content)
+        #    mail_json = generate_email_json(name, email, mailmessage.pending_subject, mailmessage.pending_content)
+        #    sender.publish_mail(mail_json)
+        # elif self.status == 'RESERVED':
+        #     mail_json = generate_email_json(name, email, mailmessage.reserved_subject, mailmessage.reserved_content)
+        #     sender.publish_mail(mail_json)
+        # elif self.status == 'APPROVED':
+        #     mail_json = generate_email_json(name, email, mailmessage.approved_subject, mailmessage.approved_content)
+        #     sender.publish_mail(mail_json)
+        # elif self.status == 'PAID':
+        #     mail_json = generate_email_json(name, email, mailmessage.paid_subject, mailmessage.paid_content)
+        #     sender.publish_mail(mail_json)
+        # elif self.status == ' REJECTED':
+        #     mail_json = generate_email_json(name, email, mailmessage.denied_subject, mailmessage.denied_content)
+        #     sender.publish_mail(mail_json)
 
 
 class Contestant(models.Model):

@@ -18,6 +18,15 @@ def generate_email_json(teamName, mailAddress, mailSubject, mailContent, passwor
     }
     return email_json
 
+def send_mail(teamName, email, mailSubject, mailContent, password=None):
+
+    subject = mailSubject
+    message = mailContent
+    if password:
+        message += "\n Your user is: %s \n Your password is %s" % (generate_user_from_email(email), password)
+    email_from = settings.EMAIL_HOST_USER
+    recipient_list = [email, ]   
+    sendMail(subject, message, email_from, recipient_list)
 
 
 def export_teams(adminType):
