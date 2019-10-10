@@ -8,22 +8,23 @@ from django.http import FileResponse
 def generate_user_from_email(email):
     return email.replace("@", "")
 
-def send_mail(contestantTeamName, contestantEmail, mailMessageSubject, mailMessageContent, password=None):
+def generate_email_json(teamName, mailAddress, mailSubject, mailContent, password=None):
+    email_json = {
+        'teamName': teamName,
+        "mailAddress": mailAddress,
+        "mailSubject": mailSubject,
+        "mailContent": mailContent,
+        "password": password
+    }
+    return email_json
 
-    subject = mailMessageSubject
-    message = mailMessageContent
-    if password:
-        message += "\n Your user is: %s \n Your password is %s" % (generate_user_from_email(contestantEmail), password)
-    email_from = settings.EMAIL_HOST_USER
-    recipient_list = [contestantEmail, ]   
-    sendMail(subject, message, email_from, recipient_list)
 
 
 def export_teams(adminType):
      # I seriously tried to avoid this bullcrap, but finally because of serializers there was no ducking conditions.
 
     from .admin import OnlineTeamAdmin, OnsiteTeamAdmin
-    from .api.serializers import OnsiteTeamListSerializer, OnlineTeamListSerializerWithAuth
+    from .api.serializers import OnsiteTeamSerializer, OnlineTeamListSerializerWithAuth
     from .models import OnlineTeam, OnsiteTeam
 
     if adminType is OnlineTeamAdmin:
@@ -31,7 +32,7 @@ def export_teams(adminType):
         serializer_class = OnlineTeamListSerializerWithAuth
     elif adminType is OnsiteTeamAdmin:
         team_class = OnsiteTeam
-        serializer_class = OnsiteTeamListSerializer
+        serializer_class = OnsiteTeamSerializer
     
     teams = team_class.objects.all()
     serializer = serializer_class(teams, many=True)

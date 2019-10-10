@@ -27,6 +27,7 @@ from .api.serializers import (
 
 class TeamAdmin(admin.ModelAdmin):
     change_list_template = 'change_list_team.html'
+    export_template = ""
 
     def get_urls(self):
         urls = super(TeamAdmin, self).get_urls()
@@ -47,6 +48,7 @@ class TeamAdmin(admin.ModelAdmin):
         if request.method == 'POST':
             export_form = ExportTeamForm(request.POST)
             if export_form.is_valid():
+                # raise Exception(self.__class__)
                 return export_form.save(classType=self.__class__)
         else:
             export_form = ExportTeamForm()
@@ -55,19 +57,40 @@ class TeamAdmin(admin.ModelAdmin):
                                                  list([(None, {'fields': export_form.base_fields})]),
                                                  {})
 
-        return render(request, 'select_export.html', context)
-
-
-
-class OnlineTeamAdmin(TeamAdmin):
-    form = OnlineTeamForm
+        return render(request, self.export_template, context)
 
 
 class OnsiteTeamAdmin(TeamAdmin):
+    
+    change_list_template = 'change_list_onsite_team.html'
+    export_template = "onsite_export.html"
+
     form = OnsiteTeamForm
 
+    def get_urls(self):
+        urls = super(OnsiteTeamAdmin, self).get_urls()
+        custom_urls = [
+            url(r'export_teams/$',
+            self.admin_site.admin_view(self.export_teams),
+            name='contests_export_onsite_teams')
+        ]
+        return custom_urls + urls
     
 
+class OnlineTeamAdmin(TeamAdmin):
+
+    change_list_template = 'change_list_online_team.html'
+    export_template = 'online_export.html'
+    form = OnlineTeamForm
+
+    def get_urls(self):
+        urls = super(OnlineTeamAdmin, self).get_urls()
+        custom_urls = [
+            url(r'export_teams/$',
+            self.admin_site.admin_view(self.export_teams),
+            name='contests_export_online_teams')
+        ]
+        return custom_urls + urls
 
 
 admin.site.register(OnsiteTeam, OnsiteTeamAdmin)

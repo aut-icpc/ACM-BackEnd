@@ -20,7 +20,7 @@
 	    {{ form.non_field_errors }}
 	{% endif %}
 
-	<form action="{% url 'admin:contests_export_teams' %}" method="post" id="export-teams"
+	<form action="{% url 'admin:contests_export_online_teams' %}" method="post" id="export-teams"
           {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}>
         {% csrf_token %}
         <div>
