@@ -93,8 +93,6 @@ class OnlineTeamAdmin(TeamAdmin):
         return custom_urls + urls
 
 
-
-
 admin.site.register(OnsiteTeam, OnsiteTeamAdmin)
 admin.site.register(OnlineTeam, OnlineTeamAdmin)
 admin.site.register(OnlineContestant)

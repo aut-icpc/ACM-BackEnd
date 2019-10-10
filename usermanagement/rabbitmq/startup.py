@@ -1,14 +1,14 @@
 import pika
 import os
 
-QUEUE_NAME = os.environ['MAIL_QUEUE']
+QUEUE_NAME = 'mail_queue' or os.environ['MAIL_QUEUE']
+RABBIT_HOST = '127.0.0.1' or os.getenv('RABBIT_HOST')
 
 
 def start():
     connection = pika.BlockingConnection(
         pika.ConnectionParameters(
-            host=os.getenv("RABBIT_HOST")
-            # host='localhost'
+            host=RABBIT_HOST
         )
     )
     channel = connection.channel()
