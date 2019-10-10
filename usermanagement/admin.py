@@ -32,14 +32,14 @@ class TeamAdmin(admin.ModelAdmin):
         urls = super(TeamAdmin, self).get_urls()
         custom_urls = [
             url(r'export_teams/$',
-            self.admin_site.admin_view(self.export_online_teams),
+            self.admin_site.admin_view(self.export_teams),
             name='contests_export_teams')
         ]
         return custom_urls + urls
 
-    def export_online_teams(self, request):
+    def export_teams(self, request):
         context = {
-            'title': ('Export Onsite Teams'),
+            'title': ('Export Teams'),
             'app_label': self.model._meta.app_label,
             'opts': self.model._meta,
             'has_change_permission': self.has_change_permission(request)
