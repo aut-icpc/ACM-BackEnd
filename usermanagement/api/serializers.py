@@ -85,6 +85,8 @@ class OnlineTeamListSerializer(serializers.ModelSerializer):
 
 class OnlineTeamListSerializerWithAuth(OnlineTeamListSerializer):
     user = serializers.SerializerMethodField()
+    contestants = OnlineContestantSerializer(many=True)
+
     class Meta:
         fields = online_team_fields + ['password', 'user']
 
@@ -97,3 +99,4 @@ class OnsiteTeamListSerializer(serializers.ModelSerializer):
     class Meta:
         model = OnsiteTeam
         exclude = ('id', )
+

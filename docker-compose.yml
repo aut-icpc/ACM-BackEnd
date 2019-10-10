@@ -40,19 +40,19 @@ services:
       - 5432:5432
     volumes:
       - pgdata:/var/lib/postgresql/data
-  emailworker:
-    build:
-      context: email_worker
-    environment:
-      - RABBIT_HOST=rabbitmq
-      - EMAIL_HOST_USER=***REMOVED***
-      - EMAIL_HOST_PASSWORD=***REMOVED***
-      - MAIL_QUEUE=mail_queue
-    # restart: on-failure
-    depends_on: 
-      - rabbitmq
-    links:
-      - rabbitmq
+  # emailworker:
+  #   build:
+  #     context: email_worker
+  #   environment:
+  #     - RABBIT_HOST=rabbitmq
+  #     - EMAIL_HOST_USER=***REMOVED***
+  #     - EMAIL_HOST_PASSWORD=***REMOVED***
+  #     - MAIL_QUEUE=mail_queue
+  #   # restart: on-failure
+  #   depends_on: 
+  #     - rabbitmq
+  #   links:
+  #     - rabbitmq
 
   rabbitmq:
     image: rabbitmq:latest

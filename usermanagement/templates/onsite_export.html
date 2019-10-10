@@ -1,0 +1,36 @@
+{% extends "admin/base_site.html" %}
+{% load i18n admin_urls static %}
+
+{# Admin styling code largely taken from http://www.dmertl.com/blog/?p=116 #}
+
+{% block extrastyle %}
+	{{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static "admin/css/forms.css" %}"/>
+{% endblock %}
+
+{% block bodyclass %}{{ opts.app_label }}-{{ opts.object_name.lower }} change-form{% endblock %}
+
+
+{% block content %}
+
+	{% if form.errors %}
+	    <p class="errornote">
+	    {% if form.errors|length == 1 %}{% trans "Please correct the error below." %}{% else %}{% trans "Please correct the errors below." %}{% endif %}
+	    </p>
+	    {{ form.non_field_errors }}
+	{% endif %}
+
+	<form action="{% url 'admin:contests_export_onsite_teams' %}" method="post" id="export-teams"
+          {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}>
+        {% csrf_token %}
+        <div>
+            {% for fieldset in adminform %}
+                {% include "admin/includes/fieldset.html" %}
+            {% endfor %}
+        </div>
+        <div class="submit-row">
+            <input type="submit" value="{% trans 'Get Exported Teams' %}" class="default"/>
+        </div>
+    </form>
+
+{% endblock %}
