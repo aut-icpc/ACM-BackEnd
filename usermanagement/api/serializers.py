@@ -15,8 +15,10 @@ from usermanagement.models import (
 )
 
 contestant_fields = ['first_name', 'last_name', 'gender', 'edu_level', 'student_number', 'email', 'phone_number']
-team_fields = ['name', 'status', 'institution', 'contestants']
+team_fields = ['name', 'status', 'institution', 'contestants'] 
 online_team_fields = team_fields + ['country']
+create_onsite_team_fields = team_fields + ['recaptcha', ]
+create_online_team_fields = create_onsite_team_fields + ['country']
 
 
 class OnsiteContestantSerializer(serializers.ModelSerializer):
@@ -39,10 +41,11 @@ class CountrySerializer(serializers.ModelSerializer):
 
 class OnsiteTeamSerializer(serializers.ModelSerializer):
     contestants = OnsiteContestantSerializer(many=True)
+    recaptcha = serializers.ReadOnlyField()
 
     class Meta:
         model = OnsiteTeam
-        fields = team_fields
+        fields = create_onsite_team_fields
 
     def create(self, validated_data):
         team = createContestants(validated_data, OnsiteTeam, OnsiteContestant)
@@ -52,10 +55,12 @@ class OnsiteTeamSerializer(serializers.ModelSerializer):
 class OnlineTeamSerializer(serializers.ModelSerializer):
     contestants = OnlineContestantSerializer(many=True)
     country = serializers.SlugRelatedField(slug_field='name', queryset=Country.objects.all())
+    recaptcha = serializers.ReadOnlyField()
 
     class Meta:
         model = OnlineTeam
-        fields = online_team_fields
+        fields = create_online_team_fields
+        # String
 
     def create(self, validated_data):
 
@@ -70,9 +75,14 @@ class OnlineTeamListSerializer(serializers.ModelSerializer):
         fields = online_team_fields
 
 
-class OnlineTeamListSerializerWithAuth(OnlineTeamListSerializer):
+class OnsiteTeamListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OnsiteTeam
+        exclude = ('id', )
+
+
+class OnlineTeamGenerateSerializer(OnlineTeamSerializer):
     user = serializers.SerializerMethodField()
-    contestants = OnlineContestantSerializer(many=True)
 
     class Meta:
         fields = online_team_fields + ['password', 'user']
@@ -82,8 +92,7 @@ class OnlineTeamListSerializerWithAuth(OnlineTeamListSerializer):
         return user
 
 
-class OnsiteTeamListSerializer(serializers.ModelSerializer):
+class OnsiteTeamGenerateSerializer(OnsiteTeamSerializer):
     class Meta:
-        model = OnsiteTeam
-        exclude = ('id', )
+        fields = team_fields
 

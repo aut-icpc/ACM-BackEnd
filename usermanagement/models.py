@@ -102,10 +102,14 @@ class OnlineTeam(Team):
         self.password = uuid.uuid4().hex[:8]
         super(OnlineTeam, self).save(*args, **kwargs)
         email = self.get_email()
+
+
         # mail_json = generate_email_json(self.name, email, mailmessage.approved_subject, mailmessage.approved_content, self.password)
         # if not sender:
         #     sender = Sender()
+
         send_mail(self.name, email, mailmessage.approved_subject, mailmessage.approved_content, self.password)
+        
         # sender.publish_mail(mail_json)
 
 
@@ -125,6 +129,7 @@ class OnsiteTeam(Team):
 
         if self.status == 'PENDING':
             send_mail(name, email, mailmessage.pending_subject, mailmessage.pending_content)
+            
         #    mail_json = generate_email_json(name, email, mailmessage.pending_subject, mailmessage.pending_content)
         #    sender.publish_mail(mail_json)
         # elif self.status == 'RESERVED':

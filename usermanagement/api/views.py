@@ -46,9 +46,10 @@ class OnlineTeamCreateView(CreateAPIView):
         try:
             if validateRecaptcha(request):
                 return super(OnlineTeamCreateView, self).create(request, *args, **kwargs)
-            raise SuspiciousOperation            
-        except IntegrityError:
-            raise SuspiciousOperation
+            else:
+                raise SuspiciousOperation("Invalid recaptcha")
+        except IntegrityError as err:
+            raise SuspiciousOperation("Invalid user parameters!")
 
 class OnsiteTeamCreateView(CreateAPIView):
     queryset = OnsiteTeam.objects.all()
@@ -58,6 +59,7 @@ class OnsiteTeamCreateView(CreateAPIView):
         try:
             if validateRecaptcha(request):
                 return super(OnsiteTeamCreateView, self).create(request, *args, **kwargs)
-            raise SuspiciousOperation
-        except IntegrityError:
-            raise SuspiciousOperation
+            else:
+                raise SuspiciousOperation("Invalid recaptcha")
+        except IntegrityError as err:
+            raise SuspiciousOperation("Invalid user parameters!")

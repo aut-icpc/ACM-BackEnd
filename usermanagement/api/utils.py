@@ -70,7 +70,7 @@ def createContestants(validated_data, TeamType, ContestantType):
 
 
 def validateRecaptcha(request):
-    recaptcha_response = request.data.pop('recaptcha')
+    recaptcha_response = request.data['recaptcha']
     url = 'https://www.google.com/recaptcha/api/siteverify'
     values = {
         'secret': settings.GOOGLE_RECAPTCHA_SECRET_KEY,
@@ -81,6 +81,7 @@ def validateRecaptcha(request):
     response = urllib.request.urlopen(req)
     result = json.loads(response.read().decode())
 
+    print(result)
     if result['success']:
         return True
     return False
