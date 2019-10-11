@@ -43,7 +43,7 @@ def createContestants(validated_data, TeamType, ContestantType):
     team.email = main_contestant_data['email']
     team.save()
 
-    main_contestant = ContestantType(**main_contestant_data)
+    main_contestant = ContestantType(team=team, **main_contestant_data)
     main_contestant.is_primary = True
     main_contestant.save()
     for contestant_data in contestants_data[1:]:

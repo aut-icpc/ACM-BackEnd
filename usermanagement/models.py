@@ -81,7 +81,7 @@ class MailMessage(models.Model):
 
 class Team(models.Model):
     name = models.CharField(max_length=25, unique=True)
-    institution = models.CharField(max_length=25)
+    institution = models.CharField(max_length=50)
 
     email = ""
 
@@ -146,7 +146,7 @@ class Contestant(models.Model):
     email_validator = EmailValidator(message="Email must be entered correctly.")
 
     first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=30)
     gender = models.CharField(max_length=5, choices=GENDER_CHOICES)
     edu_level = models.CharField(max_length=3, choices=EDU_LEVEL_CHOICES, default='BSC')
     student_number = models.CharField(max_length=20)
