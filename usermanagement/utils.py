@@ -23,7 +23,7 @@ def send_mail(teamName, email, mailSubject, mailContent, password=None):
     subject = mailSubject
     message = mailContent
     if password:
-        message += "\n Your user is: %s \n Your password is %s" % (generate_user_from_email(email), password)
+        message += "\n\n Your user is: %s \n Your password is %s" % (generate_user_from_email(email), password)
     email_from = settings.EMAIL_HOST_USER
     recipient_list = [email, ]   
     sendMail(subject, "", email_from, recipient_list, html_message=message)

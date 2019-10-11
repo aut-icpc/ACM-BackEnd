@@ -6,6 +6,7 @@ from rest_framework.generics import (
 
 from django.db import IntegrityError
 from django.core.exceptions import SuspiciousOperation
+from .utils import validateRecaptcha
 
 from usermanagement.models import (
     Country,
@@ -43,7 +44,9 @@ class OnlineTeamCreateView(CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         try:
-            return super(OnlineTeamCreateView, self).create(request, *args, **kwargs)
+            if validateRecaptcha(request):
+                return super(OnlineTeamCreateView, self).create(request, *args, **kwargs)
+            raise SuspiciousOperation            
         except IntegrityError:
             raise SuspiciousOperation
 
@@ -53,6 +56,8 @@ class OnsiteTeamCreateView(CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         try:
-            return super(OnsiteTeamCreateView, self).create(request, *args, **kwargs)
+            if validateRecaptcha(request):
+                return super(OnsiteTeamCreateView, self).create(request, *args, **kwargs)
+            raise SuspiciousOperation
         except IntegrityError:
             raise SuspiciousOperation

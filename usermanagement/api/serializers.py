@@ -2,6 +2,8 @@ from rest_framework import serializers
 from django.conf import settings
 from django.views.defaults import bad_request
 from ..utils import generate_user_from_email
+from .utils import createContestants
+
 from usermanagement.models import (
     Country,
     OnlineTeam,
@@ -35,22 +37,6 @@ class CountrySerializer(serializers.ModelSerializer):
         exclude = ('id', )
 
 
-def createContestants(validated_data, TeamType, ContestantType):
-    contestants_data = validated_data.pop('contestants')
-    main_contestant_data = contestants_data[0]
-    
-    team = TeamType(**validated_data)
-    team.email = main_contestant_data['email']
-    team.save()
-
-    main_contestant = ContestantType(team=team, **main_contestant_data)
-    main_contestant.is_primary = True
-    main_contestant.save()
-    for contestant_data in contestants_data[1:]:
-        ContestantType.objects.create(team=team, **contestant_data)
-
-    return team
-
 class OnsiteTeamSerializer(serializers.ModelSerializer):
     contestants = OnsiteContestantSerializer(many=True)
 
@@ -65,6 +51,7 @@ class OnsiteTeamSerializer(serializers.ModelSerializer):
 
 class OnlineTeamSerializer(serializers.ModelSerializer):
     contestants = OnlineContestantSerializer(many=True)
+    country = serializers.SlugRelatedField(slug_field='name', queryset=Country.objects.all())
 
     class Meta:
         model = OnlineTeam
