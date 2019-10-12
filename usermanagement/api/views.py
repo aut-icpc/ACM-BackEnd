@@ -57,9 +57,11 @@ class OnsiteTeamCreateView(CreateAPIView):
 
     def create(self, request, *args, **kwargs):
         # try:
-        if validateRecaptcha(request):
-            return super(OnsiteTeamCreateView, self).create(request, *args, **kwargs)
-        else:
-            raise SuspiciousOperation("Invalid recaptcha")
+        # if validateRecaptcha(request):
+
+        return super(OnsiteTeamCreateView, self).create(request, *args, **kwargs)
+        # else:
+            # raise SuspiciousOperation("Invalid recaptcha")
+
         # except IntegrityError as err:
         #     raise SuspiciousOperation("Invalid user parameters!")
