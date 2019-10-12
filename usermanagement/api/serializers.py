@@ -85,6 +85,7 @@ class OnlineTeamGenerateSerializer(OnlineTeamSerializer):
     user = serializers.SerializerMethodField()
 
     class Meta:
+        model = OnlineTeam
         fields = online_team_fields + ['password', 'user']
 
     def get_user(self, obj):
@@ -94,5 +95,7 @@ class OnlineTeamGenerateSerializer(OnlineTeamSerializer):
 
 class OnsiteTeamGenerateSerializer(OnsiteTeamSerializer):
     class Meta:
+        model = OnsiteTeam
         fields = team_fields
+
 
