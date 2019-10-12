@@ -1,4 +1,4 @@
-from django.core.exceptions import ValidationError
+from django.core.exceptions import SuspiciousOperation
 from django.db.models import Q
 from django.conf import settings
 
@@ -24,7 +24,7 @@ def check_uniquity(contestant_list):
                     # Check if contestants are unique from eachother
                     attribute_list = eachother_check_list[field_name]
                     if str(attribute) in attribute_list:
-                        raise ValidationError("Similar contestants in one team!")
+                        raise SuspiciousOperation("Similar contestants in one team!")
                     else:
                         eachother_check_list[field_name].append(str(attribute))
             except AttributeError:
@@ -32,7 +32,7 @@ def check_uniquity(contestant_list):
             
 
         if len(model.objects.filter(q)) != 0:
-            raise ValidationError("Similar contestant already present in the database!")
+            raise SuspiciousOperation("Similar contestant already present in the database!")
 
 
 # True for saving, false for validation
