@@ -42,24 +42,24 @@ class OnlineTeamCreateView(CreateAPIView):
     queryset = OnlineTeam.objects.all()
     serializer_class = OnlineTeamSerializer
 
-    def create(self, request, *args, **kwargs):
-        try:
-            if validateRecaptcha(request):
-                return super(OnlineTeamCreateView, self).create(request, *args, **kwargs)
-            else:
-                raise SuspiciousOperation("Invalid recaptcha")
-        except IntegrityError as err:
-            raise SuspiciousOperation("Invalid user parameters!")
+    # def create(self, request, *args, **kwargs):
+    #     try:
+    #         if validateRecaptcha(request):
+    #             return super(OnlineTeamCreateView, self).create(request, *args, **kwargs)
+    #         else:
+    #             raise SuspiciousOperation("Invalid recaptcha")
+    #     except IntegrityError as err:
+    #         raise SuspiciousOperation("Invalid user parameters!")
 
 class OnsiteTeamCreateView(CreateAPIView):
     queryset = OnsiteTeam.objects.all()
     serializer_class = OnsiteTeamSerializer
 
-    def create(self, request, *args, **kwargs):
-        try:
-            if validateRecaptcha(request):
-                return super(OnsiteTeamCreateView, self).create(request, *args, **kwargs)
-            else:
-                raise SuspiciousOperation("Invalid recaptcha")
-        except IntegrityError as err:
-            raise SuspiciousOperation("Invalid user parameters!")
+    # def create(self, request, *args, **kwargs):
+    #     try:
+    #         if validateRecaptcha(request):
+    #             return super(OnsiteTeamCreateView, self).create(request, *args, **kwargs)
+    #         else:
+    #             raise SuspiciousOperation("Invalid recaptcha")
+    #     except IntegrityError as err:
+    #         raise SuspiciousOperation("Invalid user parameters!")
