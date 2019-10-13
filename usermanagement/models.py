@@ -108,7 +108,7 @@ class OnlineTeam(Team):
         # if not sender:
         #     sender = Sender()
 
-        send_mail(self.name, email, mailmessage.approved_subject, mailmessage.approved_content, self.password)
+        send_mail(self.name, email, mailmessage.online_subject, mailmessage.online_content, self.password)
         
         # sender.publish_mail(mail_json)
 
