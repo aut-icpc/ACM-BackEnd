@@ -104,7 +104,7 @@ class OnlineTeam(Team):
         email = self.get_email()
 
 
-        # mail_json = generate_email_json(self.name, email, mailmessage.approved_subject, mailmessage.approved_content, self.password)
+        # mail_json = generate_email_json(self.name, email, mailmessage.online_subject, mailmessage.online_content, self.password)
         # if not sender:
         #     sender = Sender()
 

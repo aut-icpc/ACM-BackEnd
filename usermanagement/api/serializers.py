@@ -1,8 +1,8 @@
 from rest_framework import serializers
 from django.conf import settings
-from django.views.defaults import bad_request
+from django.core.exceptions import SuspiciousOperation
 from ..utils import generate_user_from_email
-from .utils import createContestants
+from .utils import createContestants, validate_contestants
 
 from usermanagement.models import (
     Country,
@@ -51,6 +51,14 @@ class OnsiteTeamSerializer(serializers.ModelSerializer):
         team = createContestants(validated_data, OnsiteTeam, OnsiteContestant)
         return team
 
+    def validate(self, data):
+        if validate_contestants(OnsiteContestantSerializer, data['contestants']):
+            super_val = super(OnsiteTeamSerializer, self).validate(data)
+            return super_val
+        raise SuspiciousOperation("Invalid contestants!")
+
+
+
 
 class OnlineTeamSerializer(serializers.ModelSerializer):
     contestants = OnlineContestantSerializer(many=True)
@@ -63,9 +71,14 @@ class OnlineTeamSerializer(serializers.ModelSerializer):
         # String
 
     def create(self, validated_data):
-
         team = createContestants(validated_data, OnlineTeam, OnlineContestant)
         return team
+
+    def validate(self, data):
+        if validate_contestants(OnlineContestantSerializer, data['contestants']):
+            super_val = super(OnlineTeamSerializer, self).validate(data)
+            return super_val
+        raise SuspiciousOperation("Invalid contestants!")
 
 class OnlineTeamListSerializer(serializers.ModelSerializer):
     country = serializers.SlugRelatedField(slug_field='name', read_only=True)

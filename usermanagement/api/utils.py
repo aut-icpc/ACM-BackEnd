@@ -60,8 +60,6 @@ def createTeamsAndContestants(validated_data, TeamType, ContestantType, team, co
 
 def createContestants(validated_data, TeamType, ContestantType):
     
-    # print(validated_data)
-    validated_data.update({"status": "PENDING"})
     contestants_data = validated_data.pop('contestants')
     main_contestant_data = contestants_data[0]
     team = TeamType(**validated_data)
@@ -86,4 +84,14 @@ def validateRecaptcha(request):
     print(result)
     if result['success']:
         return True
+    return False
+
+
+def validate_contestants(contestant_serializer, contestant_list):
+    if len(contestant_list) == 3:
+        result = True
+        for contestant in contestant_list:
+            serializer = contestant_serializer(data=contestant)
+            result &= serializer.is_valid()
+        return result
     return False
