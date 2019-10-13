@@ -60,6 +60,8 @@ def createTeamsAndContestants(validated_data, TeamType, ContestantType, team, co
 
 def createContestants(validated_data, TeamType, ContestantType):
     
+    # print(validated_data)
+    validated_data.update({"status": "PENDING"})
     contestants_data = validated_data.pop('contestants')
     main_contestant_data = contestants_data[0]
     team = TeamType(**validated_data)

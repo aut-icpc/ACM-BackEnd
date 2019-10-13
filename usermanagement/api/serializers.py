@@ -15,7 +15,7 @@ from usermanagement.models import (
 )
 
 contestant_fields = ['first_name', 'last_name', 'gender', 'edu_level', 'student_number', 'email', 'phone_number']
-team_fields = ['name', 'status', 'institution', 'contestants'] 
+team_fields = ['name', 'institution', 'contestants'] 
 online_team_fields = team_fields + ['country']
 create_onsite_team_fields = team_fields + ['recaptcha', ]
 create_online_team_fields = create_onsite_team_fields + ['country']
