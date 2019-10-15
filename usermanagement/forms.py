@@ -5,7 +5,7 @@ from .models import (
     OnlineTeam,
 )
 from django.http import HttpResponseServerError, FileResponse
-from .utils import export_teams, json_to_sv_file_response
+from .utils import export_teams, team_json_to_sv_file_response, contestant_json_to_sv_file_response
 import json
 import io
 
@@ -38,14 +38,21 @@ EXPORT_CHOICES = (
     ('TSV', 'TSV')
 )
 
+FORMAT_CHOICES = (
+    ('TEAM', 'Team-based'),
+    ('CONTESTANT', 'Contestant-Based')
+)
+
 class ExportTeamForm(forms.Form):
     export_type = forms.ChoiceField(choices=EXPORT_CHOICES)
+    format_type = forms.ChoiceField(choices=FORMAT_CHOICES)
 
     def save(self, classType=None):
         
         teams_json = export_teams(classType)
         file_name = classType.__name__[:-5]
         exp_type = self.cleaned_data['export_type']
+        format_type = self.cleaned_data['format_type']
 
         if exp_type == 'JSON':
             file_name += ".json"
@@ -57,11 +64,17 @@ class ExportTeamForm(forms.Form):
            
         elif exp_type == 'CSV':
             file_name += '.csv'
-            return json_to_sv_file_response(teams_json, file_name, ',')
+            if format_type == 'TEAM':
+                return team_json_to_sv_file_response(teams_json, file_name, ',')
+            else:
+                return contestant_json_to_sv_file_response(teams_json, file_name, ',')
         
         elif exp_type == 'TSV':
             file_name += '.tsv'
-            return json_to_sv_file_response(teams_json, file_name, '\t')
+            if format_type == 'TEAM':
+                return team_json_to_sv_file_response(teams_json, file_name, '\t')
+            else:
+                return contestant_json_to_sv_file_response(teams_json, file_name, '\t')
 
         return HttpResponseServerError
 

@@ -36,6 +36,7 @@ ONSITE_TEAM_STATUS_CHOICES = (
     ('PAID', 'Finalized Registration'),
     ('RESERVED', 'Reserved registration beforehand') ) + TEAM_STATUS_CHOICES
 
+#TODO: This should be changed as online teams have no payment process.
 ONLINE_TEAM_STATUS_CHOICES = () + TEAM_STATUS_CHOICES
 
 # sender = None

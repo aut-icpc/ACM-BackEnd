@@ -99,12 +99,11 @@ class OnlineTeamGenerateSerializer(OnlineTeamSerializer):
 
     class Meta:
         model = OnlineTeam
-        fields = online_team_fields + ['password', 'user']
+        fields = online_team_fields + ['user', 'password']
 
     def get_user(self, obj):
-        user = generate_user_from_email(obj.contestants[0].email)
+        user = generate_user_from_email(obj.contestants.all()[0].email)
         return user
-
 
 class OnsiteTeamGenerateSerializer(OnsiteTeamSerializer):
     class Meta:

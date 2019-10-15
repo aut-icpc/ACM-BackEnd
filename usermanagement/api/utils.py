@@ -1,8 +1,14 @@
 from django.core.exceptions import SuspiciousOperation
 from django.db.models import Q
 from django.conf import settings
+from rest_framework.exceptions import APIException
 
 import json, urllib
+
+class TemporarilyUnavailable(APIException):
+    status_code = 503
+    default_detail = 'Service temporarily unavailable, try again later.'
+    default_code = 'service_unavailable'
 
 def check_uniquity(contestant_list):
     meta = contestant_list[0]._meta
@@ -38,7 +44,10 @@ def check_uniquity(contestant_list):
 # True for saving, false for validation
 def createTeamsAndContestants(validated_data, TeamType, ContestantType, team, contestants_data, main_contestant_data, save=False):
     if save:
-        team.save()
+        try:
+            team.save()
+        except:
+            raise TemporarilyUnavailable()
     # Cleaning team fields is redundant because it calls super.save before emailing people.
 
     main_contestant = ContestantType(team=team, **main_contestant_data)
