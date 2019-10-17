@@ -21,7 +21,7 @@ services:
     volumes:
       - ./static:/app/static
       - ./images:/app/images
-      - ./apps.log:/app/apps.log
+      - ./logs:/app/logs
 
 
   webserver:
