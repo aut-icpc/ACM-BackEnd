@@ -21,6 +21,8 @@ services:
     volumes:
       - ./static:/app/static
       - ./images:/app/images
+      - ./apps.log:/app/apps.log
+
 
   webserver:
     image: nginx:1.17.1
@@ -54,23 +56,23 @@ services:
   #   links:
   #     - rabbitmq
 
-  rabbitmq:
-    image: rabbitmq:latest
-    # hostname: rabbitmq
-    environment: 
-      - HOSTNAME=rabbitmq
-    ports: 
-      # - "4369:4369"
-      - "5671:5671"
-      - "5672:5672"
-      - "25672:25672"
-      - "15671:15671"
-      - "15672:15672"
-    healthcheck:
-        test: ["CMD", "curl", "-f", "http://localhost:15672"]
-        interval: 30s
-        timeout: 10s
-        retries: 5
+  # rabbitmq:
+  #   image: rabbitmq:latest
+  #   # hostname: rabbitmq
+  #   environment: 
+  #     - HOSTNAME=rabbitmq
+  #   ports: 
+  #     # - "4369:4369"
+  #     - "5671:5671"
+  #     - "5672:5672"
+  #     - "25672:25672"
+  #     - "15671:15671"
+  #     - "15672:15672"
+  #   healthcheck:
+  #       test: ["CMD", "curl", "-f", "http://localhost:15672"]
+  #       interval: 30s
+  #       timeout: 10s
+  #       retries: 5
 
 
 volumes:

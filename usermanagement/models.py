@@ -101,17 +101,17 @@ class OnlineTeam(Team):
         mailmessage = MailMessage.load()
         # Online team is accepted by default, unless something changes. 
         self.password = uuid.uuid4().hex[:8]
-        super(OnlineTeam, self).save(*args, **kwargs)
         email = self.get_email()
-
 
         # mail_json = generate_email_json(self.name, email, mailmessage.online_subject, mailmessage.online_content, self.password)
         # if not sender:
         #     sender = Sender()
+        # sender.publish_mail(mail_json)
+
 
         send_mail(self.name, email, mailmessage.online_subject, mailmessage.online_content, self.password)
         
-        # sender.publish_mail(mail_json)
+        super(OnlineTeam, self).save(*args, **kwargs)
 
 
 class OnsiteTeam(Team):
@@ -122,8 +122,6 @@ class OnsiteTeam(Team):
         mailmessage = MailMessage.load()
         email = self.get_email()
         name = self.name
-
-        super(OnsiteTeam, self).save(*args, **kwargs)
 
         # if not sender:
         #     sender = Sender()
@@ -145,6 +143,9 @@ class OnsiteTeam(Team):
         # elif self.status == ' REJECTED':
         #     mail_json = generate_email_json(name, email, mailmessage.denied_subject, mailmessage.denied_content)
         #     sender.publish_mail(mail_json)
+
+        super(OnsiteTeam, self).save(*args, **kwargs)
+
 
 
 class Contestant(models.Model):

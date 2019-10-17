@@ -22,6 +22,9 @@ services:
       - type: bind
         source: /var/www/images
         target: /app/images
+      - type: bind
+        source: /etc/api_logs
+        target: /app/logs
     networks:
       - production-net
 

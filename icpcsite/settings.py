@@ -187,7 +187,7 @@ LOGGING = {
         'file': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
-            'filename': '/etc/apps.log/api.log',
+            'filename': './logs/api.log',
         },
     },
     'loggers': {
