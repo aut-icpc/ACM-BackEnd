@@ -99,17 +99,18 @@ class OnlineTeam(Team):
 
     def save(self, *args, **kwargs):
         mailmessage = MailMessage.load()
+
         # Online team is accepted by default, unless something changes. 
         self.password = uuid.uuid4().hex[:8]
-        super(OnlineTeam, self).save(*args, **kwargs)
         email = self.get_email()
-
 
         # mail_json = generate_email_json(self.name, email, mailmessage.online_subject, mailmessage.online_content, self.password)
         # if not sender:
         #     sender = Sender()
 
         send_mail(self.name, email, mailmessage.online_subject, mailmessage.online_content, self.password)
+        super(OnlineTeam, self).save(*args, **kwargs)
+
         
         # sender.publish_mail(mail_json)
 
@@ -123,13 +124,13 @@ class OnsiteTeam(Team):
         email = self.get_email()
         name = self.name
 
-        super(OnsiteTeam, self).save(*args, **kwargs)
-
         # if not sender:
         #     sender = Sender()
 
         if self.status == 'PENDING':
             send_mail(name, email, mailmessage.pending_subject, mailmessage.pending_content)
+
+        super(OnsiteTeam, self).save(*args, **kwargs)        
             
         #    mail_json = generate_email_json(name, email, mailmessage.pending_subject, mailmessage.pending_content)
         #    sender.publish_mail(mail_json)

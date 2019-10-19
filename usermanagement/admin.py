@@ -49,7 +49,7 @@ class TeamAdmin(admin.ModelAdmin):
             export_form = ExportTeamForm(request.POST)
             if export_form.is_valid():
                 # raise Exception(self.__class__)
-                return export_form.save(classType=self.__class__)
+                return export_form.save(adminType=self.__class__)
         else:
             export_form = ExportTeamForm()
         context['form'] = export_form

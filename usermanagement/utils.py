@@ -45,7 +45,24 @@ def export_teams(adminType):
     
     teams = team_class.objects.all()
     serializer = serializer_class(teams, many=True)
+
     return serializer.data
+
+def export_contestants(adminType):
+    from .admin import OnlineTeamAdmin, OnsiteTeamAdmin
+    from .api.serializers import OnsiteContestantGenerateSerializer, OnsiteContestantGenerateSerializer
+    from .models import OnsiteContestant, OnlineContestant
+
+    if adminType is OnsiteTeamAdmin:
+        serializer_class = OnsiteContestantGenerateSerializer
+        contestant_class = OnsiteContestant
+    elif adminType is OnlineTeamAdmin:
+        serializer_class = OnsiteContestantGenerateSerializer
+        contestant_class = OnlineContestant
+    contestants = contestant_class.objects.order_by('team__name')
+    serializer = serializer_class(contestants, many=True)
+    return serializer.data
+
 
 def create_sv_response(sv_str, file_name):
     sv_bytes = str.encode(sv_str, encoding='utf-8')
@@ -57,45 +74,32 @@ def create_sv_response(sv_str, file_name):
 
 # Separator is either comma or a tab character
 
-def team_json_to_sv_file_response(json_obj, file_name, separator, team=False):
+def generate_sv_str(headers, separator):
+    return separator.join(headers) + '\n'
+
+
+def generate_current_line(headers, record, separator):
+    currentLine = []
+    for header in headers:
+        if header in record.keys():
+            currentLine.append(record[header])
+        else:
+            currentLine.append('')
+    add_str = generate_sv_str(currentLine, separator)
+    return add_str
+
+
+def team_json_to_sv_file_response(json_obj, file_name, separator):
 
      # Keep track of headers in a set
-    for obj in json_obj:
-        obj.pop('contestants')
-
     headers = json_obj[0].keys()
 
     # You only know what headers were there once you have read all the JSON once.
     # Now we have all the information we need, like what all possible headers are.
     
-    sv_str = separator.join(headers) + '\n'
+    sv_str = generate_sv_str(headers, separator)
     for record in json_obj:
-        currentLine = []
-        for header in headers:
-            if header in record.keys():
-                currentLine.append(record[header])
-            else:
-                currentLine.append('')
-        sv_str += separator.join(currentLine) + '\n'
+        sv_str += generate_current_line(headers, record, separator)
     
-    return create_sv_response(sv_str, file_name)
-   
-def contestant_json_to_sv_file_response(team_json, file_name, separator):
-
-    headers = team_json[0]['contestants'][0].keys()
-    sv_str = separator.join(headers) + '\n'
-    
-    for obj in team_json:
-        contestants = obj.pop('contestants')
-        team = obj.pop('name')
-        for contestant in contestants:
-            currentLine = []
-            contestant.update({'team': team})
-            for header in headers:
-                if header in contestant.keys():
-                    currentLine.append(contestant[header])
-                else:
-                    currentLine.append('')
-            sv_str += separator.join(currentLine) + '\n'
     return create_sv_response(sv_str, file_name)
 

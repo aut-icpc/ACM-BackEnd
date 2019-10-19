@@ -5,7 +5,11 @@ from .models import (
     OnlineTeam,
 )
 from django.http import HttpResponseServerError, FileResponse
-from .utils import export_teams, team_json_to_sv_file_response, contestant_json_to_sv_file_response
+from .utils import (
+    export_teams, 
+    export_contestants,
+    team_json_to_sv_file_response
+) 
 import json
 import io
 
@@ -47,12 +51,15 @@ class ExportTeamForm(forms.Form):
     export_type = forms.ChoiceField(choices=EXPORT_CHOICES)
     format_type = forms.ChoiceField(choices=FORMAT_CHOICES)
 
-    def save(self, classType=None):
-        
-        teams_json = export_teams(classType)
-        file_name = classType.__name__[:-5]
+    def save(self, adminType=None):
+        file_name = adminType.__name__[:-5]
         exp_type = self.cleaned_data['export_type']
         format_type = self.cleaned_data['format_type']
+
+        if format_type == 'TEAM':
+            teams_json = export_teams(adminType)
+        elif format_type == 'CONTESTANT':
+            teams_json = export_contestants(adminType)
 
         if exp_type == 'JSON':
             file_name += ".json"
@@ -64,17 +71,12 @@ class ExportTeamForm(forms.Form):
            
         elif exp_type == 'CSV':
             file_name += '.csv'
-            if format_type == 'TEAM':
-                return team_json_to_sv_file_response(teams_json, file_name, ',')
-            else:
-                return contestant_json_to_sv_file_response(teams_json, file_name, ',')
+            return team_json_to_sv_file_response(teams_json, file_name, ',')
         
         elif exp_type == 'TSV':
             file_name += '.tsv'
-            if format_type == 'TEAM':
-                return team_json_to_sv_file_response(teams_json, file_name, '\t')
-            else:
-                return contestant_json_to_sv_file_response(teams_json, file_name, '\t')
+            return team_json_to_sv_file_response(teams_json, file_name, '\t')
+
 
         return HttpResponseServerError
 

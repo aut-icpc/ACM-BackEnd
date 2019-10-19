@@ -15,16 +15,19 @@ from usermanagement.models import (
 )
 
 contestant_fields = ['first_name', 'last_name', 'gender', 'edu_level', 'student_number', 'email', 'phone_number']
+onsite_contestant_fields = contestant_fields + ['shirt_size']
 team_fields = ['name', 'institution', 'contestants'] 
 online_team_fields = team_fields + ['country']
 create_onsite_team_fields = team_fields + ['recaptcha', ]
 create_online_team_fields = create_onsite_team_fields + ['country']
+generate_team_fields = ['name', 'institution']
+generate_online_team_fields = generate_team_fields + ['country']
 
 
 class OnsiteContestantSerializer(serializers.ModelSerializer):
     class Meta:
         model = OnsiteContestant
-        fields = contestant_fields + ['shirt_size']
+        fields = onsite_contestant_fields
 
 
 class OnlineContestantSerializer(serializers.ModelSerializer):
@@ -56,8 +59,6 @@ class OnsiteTeamSerializer(serializers.ModelSerializer):
             super_val = super(OnsiteTeamSerializer, self).validate(data)
             return super_val
         raise SuspiciousOperation("Invalid contestants!")
-
-
 
 
 class OnlineTeamSerializer(serializers.ModelSerializer):
@@ -99,7 +100,7 @@ class OnlineTeamGenerateSerializer(OnlineTeamSerializer):
 
     class Meta:
         model = OnlineTeam
-        fields = online_team_fields + ['user', 'password']
+        fields = generate_online_team_fields + ['user', 'password']
 
     def get_user(self, obj):
         user = generate_user_from_email(obj.contestants.all()[0].email)
@@ -108,6 +109,19 @@ class OnlineTeamGenerateSerializer(OnlineTeamSerializer):
 class OnsiteTeamGenerateSerializer(OnsiteTeamSerializer):
     class Meta:
         model = OnsiteTeam
-        fields = team_fields
+        fields = generate_team_fields
 
 
+class OnsiteContestantGenerateSerializer(OnsiteContestantSerializer):
+    team = serializers.SlugRelatedField(slug_field='name', read_only=True)
+
+    class Meta:
+        model = OnsiteContestant
+        fields = onsite_contestant_fields + ['team']
+
+class OnlineContestantGenerateSerializer(OnlineContestantSerializer):
+    team = serializers.SlugRelatedField(slug_field='name', read_only=True)
+
+    class Meta:
+        model = OnlineContestant
+        fields = contestant_fields + ['team']
