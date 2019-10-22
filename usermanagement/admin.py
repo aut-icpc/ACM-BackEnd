@@ -29,6 +29,17 @@ class TeamAdmin(admin.ModelAdmin):
     change_list_template = 'change_list_team.html'
     export_template = ""
 
+    list_display = ['name', 'institution', 'status']
+
+    def name(self, obj):
+        return obj.name
+
+    def institution(self, obj):
+        return obj.institution
+    
+    def status(self, obj):
+        return obj.status
+
     def get_urls(self):
         urls = super(TeamAdmin, self).get_urls()
         custom_urls = [
