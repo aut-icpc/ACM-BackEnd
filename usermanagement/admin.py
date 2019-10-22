@@ -92,10 +92,33 @@ class OnlineTeamAdmin(TeamAdmin):
         ]
         return custom_urls + urls
 
+class ContestantAdmin(admin.ModelAdmin):
+    list_display = ['show_name', 'show_team', 'show_institution']
+
+    def show_team(self, obj):
+        return obj.team.name
+    show_team.short_description = "team"
+
+    def show_institution(self, obj):
+        return obj.team.institution
+    show_institution.short_description = "institution"
+
+    def show_name(self, obj):
+        return str(obj)
+    show_name.short_description = 'name'
+
+class OnsiteContestantAdmin(ContestantAdmin):
+    class Meta:
+        model = OnsiteContestant
+
+class OnlineContestantAdmin(ContestantAdmin):
+    class Meta:
+        model = OnlineContestant
+
 
 admin.site.register(OnsiteTeam, OnsiteTeamAdmin)
 admin.site.register(OnlineTeam, OnlineTeamAdmin)
-admin.site.register(OnlineContestant)
-admin.site.register(OnsiteContestant)
+admin.site.register(OnlineContestant, OnlineContestantAdmin)
+admin.site.register(OnsiteContestant, OnsiteContestantAdmin)
 admin.site.register(Country)
 admin.site.register(MailMessage)

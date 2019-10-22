@@ -29,7 +29,7 @@ def send_mail(teamName, email, mailSubject, mailContent, password=None):
     sendMail(subject, "", email_from, recipient_list, html_message=message)
 
 
-def export_teams(adminType):
+def export_teams(adminType, is_finalized):
      # I seriously tried to avoid this bullcrap, but finally because of serializers there was no ducking conditions.
 
     from .admin import OnlineTeamAdmin, OnsiteTeamAdmin
@@ -42,13 +42,15 @@ def export_teams(adminType):
     elif adminType is OnsiteTeamAdmin:
         team_class = OnsiteTeam
         serializer_class = OnsiteTeamGenerateSerializer
-    
-    teams = team_class.objects.all()
+    if is_finalized:
+        teams = team_class.objects.filter(status='PAID')
+    else:
+        teams = team_class.objects.all()
     serializer = serializer_class(teams, many=True)
 
     return serializer.data
 
-def export_contestants(adminType):
+def export_contestants(adminType, is_finalized):
     from .admin import OnlineTeamAdmin, OnsiteTeamAdmin
     from .api.serializers import OnsiteContestantGenerateSerializer, OnsiteContestantGenerateSerializer
     from .models import OnsiteContestant, OnlineContestant
@@ -56,10 +58,23 @@ def export_contestants(adminType):
     if adminType is OnsiteTeamAdmin:
         serializer_class = OnsiteContestantGenerateSerializer
         contestant_class = OnsiteContestant
+        team_class = "onsiteteam"
     elif adminType is OnlineTeamAdmin:
         serializer_class = OnsiteContestantGenerateSerializer
         contestant_class = OnlineContestant
-    contestants = contestant_class.objects.order_by('team__name')
+        team_class = "onlineteam"
+
+    if is_finalized:
+        team_ids = []
+        contestants_all = contestant_class.objects.all()
+        for contestant in contestants_all:
+            team_ptr = getattr(contestant.team, team_class)
+            if team_ptr.status == 'PAID':
+                team_ids.append(team_ptr.id)
+        contestants = contestant_class.objects.filter(team__id__in=team_ids).order_by('team__name')
+    else:
+        contestants = contestant_class.objects.order_by('team__name')
+
     serializer = serializer_class(contestants, many=True)
     return serializer.data
 

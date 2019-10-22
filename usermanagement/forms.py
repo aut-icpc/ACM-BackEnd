@@ -50,16 +50,18 @@ FORMAT_CHOICES = (
 class ExportTeamForm(forms.Form):
     export_type = forms.ChoiceField(choices=EXPORT_CHOICES)
     format_type = forms.ChoiceField(choices=FORMAT_CHOICES)
+    is_finalized = forms.BooleanField(required=False)
 
     def save(self, adminType=None):
         file_name = adminType.__name__[:-5]
         exp_type = self.cleaned_data['export_type']
         format_type = self.cleaned_data['format_type']
+        is_finalized = self.cleaned_data['is_finalized']
 
         if format_type == 'TEAM':
-            teams_json = export_teams(adminType)
+            teams_json = export_teams(adminType, is_finalized)
         elif format_type == 'CONTESTANT':
-            teams_json = export_contestants(adminType)
+            teams_json = export_contestants(adminType, is_finalized)
 
         if exp_type == 'JSON':
             file_name += ".json"
