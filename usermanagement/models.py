@@ -107,8 +107,8 @@ class OnlineTeam(Team):
         # mail_json = generate_email_json(self.name, email, mailmessage.online_subject, mailmessage.online_content, self.password)
         # if not sender:
         #     sender = Sender()
-
-        send_mail(self.name, email, mailmessage.online_subject, mailmessage.online_content, self.password)
+        if self.sendNewMail:
+            send_mail(self.name, email, mailmessage.online_subject, mailmessage.online_content, self.password)
         super(OnlineTeam, self).save(*args, **kwargs)
 
         
@@ -124,11 +124,13 @@ class OnsiteTeam(Team):
         email = self.get_email()
         name = self.name
 
+
         # if not sender:
         #     sender = Sender()
 
-        if self.status == 'PENDING':
-            send_mail(name, email, mailmessage.pending_subject, mailmessage.pending_content)
+        if self.sendNewMail:
+            if self.status == 'PENDING':
+                send_mail(name, email, mailmessage.pending_subject, mailmessage.pending_content)
 
         super(OnsiteTeam, self).save(*args, **kwargs)        
             

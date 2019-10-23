@@ -45,10 +45,11 @@ def check_uniquity(contestant_list):
 def createTeamsAndContestants(validated_data, TeamType, ContestantType, team, contestants_data, main_contestant_data, save=False):
     if save:
         try:
+            team.sendNewMail = True
             team.save()
         except:
             raise TemporarilyUnavailable()
-    # Cleaning team fields is redundant because it calls super.save before emailing people.
+    # Cleaning team fields is redundant because there's only one of it and it gets created/saved before everything else.
 
     main_contestant = ContestantType(team=team, **main_contestant_data)
     main_contestant.is_primary = True

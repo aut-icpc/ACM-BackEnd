@@ -24,6 +24,13 @@ class TeamForm(forms.ModelForm):
             print(ex)
             print("Adding teams through admin is kinda bad practice, kinda.")
         return self.cleaned_data
+    
+    def save(self, commit=True):
+        instance = super(TeamForm, self).save(commit=False)
+        instance.sendNewMail = 'status' in self.changed_data
+        if commit:
+            instance.save()
+        return instance
 
 class OnlineTeamForm(TeamForm):
     list_display = ('name', 'country', 'institution')
