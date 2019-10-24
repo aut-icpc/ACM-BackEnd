@@ -160,7 +160,7 @@ class Contestant(models.Model):
     edu_level = models.CharField(max_length=3, choices=EDU_LEVEL_CHOICES, default='BSC')
     student_number = models.CharField(max_length=20)
     email = models.CharField(max_length=100, unique=True, validators=[email_validator])
-    phone_number = models.CharField(validators=[phone_validator], blank=True, max_length=20)
+    phone_number = models.CharField(validators=[phone_validator], blank=True, max_length=20, null=True)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='contestants')
     is_primary = models.BooleanField(default=False)
  
