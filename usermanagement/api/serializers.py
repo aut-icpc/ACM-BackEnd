@@ -22,6 +22,7 @@ create_onsite_team_fields = team_fields + ['recaptcha', ]
 create_online_team_fields = create_onsite_team_fields + ['country']
 generate_team_fields = ['name', 'institution']
 generate_online_team_fields = generate_team_fields + ['country']
+generate_contestant_fields = ['team', 'institution']
 
 
 class OnsiteContestantSerializer(serializers.ModelSerializer):
@@ -112,16 +113,23 @@ class OnsiteTeamGenerateSerializer(OnsiteTeamSerializer):
         fields = generate_team_fields
 
 
-class OnsiteContestantGenerateSerializer(OnsiteContestantSerializer):
+class ContestantGenerateSerializer(serializers.ModelSerializer):
+    institution = serializers.SerializerMethodField()
+
+    def get_institution(self, obj):
+        return obj.team.institution
+
+
+class OnsiteContestantGenerateSerializer(OnsiteContestantSerializer, ContestantGenerateSerializer):
     team = serializers.SlugRelatedField(slug_field='name', read_only=True)
 
     class Meta:
         model = OnsiteContestant
-        fields = onsite_contestant_fields + ['team']
+        fields = onsite_contestant_fields + generate_contestant_fields
 
-class OnlineContestantGenerateSerializer(OnlineContestantSerializer):
+class OnlineContestantGenerateSerializer(OnlineContestantSerializer, ContestantGenerateSerializer):
     team = serializers.SlugRelatedField(slug_field='name', read_only=True)
 
     class Meta:
         model = OnlineContestant
-        fields = contestant_fields + ['team']
+        fields = contestant_fields + generate_contestant_fields

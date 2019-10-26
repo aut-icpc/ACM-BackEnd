@@ -75,6 +75,7 @@ def createContestants(validated_data, TeamType, ContestantType):
     team = TeamType(**validated_data)
     team.email = main_contestant_data['email']
 
+    #TODO: I feel like this part of code could be more optimized.
     createTeamsAndContestants(validated_data, TeamType, ContestantType, team, contestants_data, main_contestant_data)
     return createTeamsAndContestants(validated_data, TeamType, ContestantType, team, contestants_data, main_contestant_data, save=True)
 
@@ -91,6 +92,7 @@ def validateRecaptcha(request):
     response = urllib.request.urlopen(req)
     result = json.loads(response.read().decode())
 
+    #TODO: Find out what was wrong with recaptcha validation.
     print(result)
     if result['success']:
         return True
