@@ -2,6 +2,7 @@ from django.core.exceptions import SuspiciousOperation
 from django.db.models import Q
 from django.conf import settings
 from rest_framework.exceptions import APIException
+from usermanagement.models import OnlineTeam
 
 import json, urllib
 
@@ -74,6 +75,10 @@ def createContestants(validated_data, TeamType, ContestantType):
     main_contestant_data = contestants_data[0]
     team = TeamType(**validated_data)
     team.email = main_contestant_data['email']
+
+    # Temporary Change: because Reza wants to deny teams from specific countries
+    if TeamType is OnlineTeam:
+        team.status = 'PENDING'
 
     #TODO: I feel like this part of code could be more optimized.
     createTeamsAndContestants(validated_data, TeamType, ContestantType, team, contestants_data, main_contestant_data)
