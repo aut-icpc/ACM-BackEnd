@@ -17,11 +17,12 @@ from usermanagement.models import (
 contestant_fields = ['first_name', 'last_name', 'gender', 'edu_level', 'student_number', 'email']
 onsite_contestant_fields = contestant_fields + ['phone_number', 'shirt_size']
 team_fields = ['name', 'institution', 'contestants'] 
-online_team_fields = team_fields + ['country']
+online_fields = ['country', ]
+online_team_fields = team_fields + online_fields
 create_onsite_team_fields = team_fields + ['recaptcha', ]
-create_online_team_fields = create_onsite_team_fields + ['country']
+create_online_team_fields = create_onsite_team_fields + online_fields
 generate_team_fields = ['name', 'institution']
-generate_online_team_fields = generate_team_fields + ['country']
+generate_online_team_fields = generate_team_fields + online_fields
 generate_contestant_fields = ['team', 'institution']
 
 
@@ -115,21 +116,19 @@ class OnsiteTeamGenerateSerializer(OnsiteTeamSerializer):
 
 class ContestantGenerateSerializer(serializers.ModelSerializer):
     institution = serializers.SerializerMethodField()
+    team = serializers.SlugRelatedField(slug_field='name', read_only=True)
 
     def get_institution(self, obj):
         return obj.team.institution
 
 
-class OnsiteContestantGenerateSerializer(OnsiteContestantSerializer, ContestantGenerateSerializer):
-    team = serializers.SlugRelatedField(slug_field='name', read_only=True)
-
+class OnsiteContestantGenerateSerializer(ContestantGenerateSerializer):
     class Meta:
         model = OnsiteContestant
         fields = onsite_contestant_fields + generate_contestant_fields
 
-class OnlineContestantGenerateSerializer(OnlineContestantSerializer, ContestantGenerateSerializer):
-    team = serializers.SlugRelatedField(slug_field='name', read_only=True)
 
+class OnlineContestantGenerateSerializer(ContestantGenerateSerializer):
     class Meta:
         model = OnlineContestant
         fields = contestant_fields + generate_contestant_fields

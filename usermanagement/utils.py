@@ -52,7 +52,7 @@ def export_teams(adminType, is_finalized):
 
 def export_contestants(adminType, is_finalized):
     from .admin import OnlineTeamAdmin, OnsiteTeamAdmin
-    from .api.serializers import OnsiteContestantGenerateSerializer, OnsiteContestantGenerateSerializer
+    from .api.serializers import OnsiteContestantGenerateSerializer, OnlineContestantGenerateSerializer
     from .models import OnsiteContestant, OnlineContestant
 
     if adminType is OnsiteTeamAdmin:
@@ -60,7 +60,7 @@ def export_contestants(adminType, is_finalized):
         contestant_class = OnsiteContestant
         team_class = "onsiteteam"
     elif adminType is OnlineTeamAdmin:
-        serializer_class = OnsiteContestantGenerateSerializer
+        serializer_class = OnlineContestantGenerateSerializer
         contestant_class = OnlineContestant
         team_class = "onlineteam"
 
