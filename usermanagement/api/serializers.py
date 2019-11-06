@@ -14,8 +14,8 @@ from usermanagement.models import (
     MailMessage
 )
 
-contestant_fields = ['first_name', 'last_name', 'gender', 'edu_level', 'student_number', 'email', 'phone_number']
-onsite_contestant_fields = contestant_fields + ['shirt_size']
+contestant_fields = ['first_name', 'last_name', 'gender', 'edu_level', 'student_number', 'email']
+onsite_contestant_fields = contestant_fields + ['phone_number', 'shirt_size']
 team_fields = ['name', 'institution', 'contestants'] 
 online_team_fields = team_fields + ['country']
 create_onsite_team_fields = team_fields + ['recaptcha', ]
