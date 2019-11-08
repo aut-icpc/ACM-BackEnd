@@ -15,7 +15,6 @@ services:
       placement:
         constraints: [node.role == manager]
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
       - type: bind
         source: /var/www/static
         target: /app/static
