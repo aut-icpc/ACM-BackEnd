@@ -37,7 +37,7 @@ class ContestRetrieveView(RetrieveAPIView):
 
 class ContestListView(ListAPIView):
     # queryset = Contest.objects.all()
-    queryset = Contest.objects.filter(has_passed=True)
+    queryset = Contest.objects.filter(has_passed=True).order_by('-year')
     serializer_class = ContestSerializer
 
 
