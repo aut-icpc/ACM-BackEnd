@@ -12,12 +12,10 @@ services:
       - POSTGRES_PORT=5432
       - POSTGRES_DATABASE_NAME=postgres
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=***REMOVED***
-      - SECRET_KEY=***REMOVED***
+      - POSTGRES_PASSWORD=
+      - SECRET_KEY=
       - EMAIL_HOST_USER=
       - EMAIL_HOST_PASSWORD=
-      - RABBIT_HOST=rabbitmq
-      - MAIL_QUEUE=mail_queue
     volumes:
       - ./static:/app/static
       - ./images:/app/images
@@ -34,33 +32,18 @@ services:
     image: postgres:11
     environment:
       - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=***REMOVED***
+      - POSTGRES_USER=
+      - POSTGRES_PASSWORD=
     ports:
       - 5432:5432
     volumes:
       - pgdata:/var/lib/postgresql/data
-  # emailworker:
-  #   build:
-  #     context: email_worker
-  #   environment:
-  #     - RABBIT_HOST=rabbitmq
-  #     - EMAIL_HOST_USER=***REMOVED***
-  #     - EMAIL_HOST_PASSWORD=***REMOVED***
-  #     - MAIL_QUEUE=mail_queue
-  #   # restart: on-failure
-  #   depends_on: 
-  #     - rabbitmq
-  #   links:
-  #     - rabbitmq
-
   rabbitmq:
     image: rabbitmq:latest
     # hostname: rabbitmq
     environment: 
       - HOSTNAME=rabbitmq
     ports: 
-      # - "4369:4369"
       - "5671:5671"
       - "5672:5672"
       - "25672:25672"
