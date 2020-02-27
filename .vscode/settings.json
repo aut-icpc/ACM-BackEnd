@@ -1,0 +1,20 @@
+{
+    "python.pythonPath": "C:\\Program Files\\Python\\Python38\\python.exe",
+    "editor.formatOnSave": true,
+    "python.linting.pycodestyleEnabled": true,
+    "python.linting.pylintPath": "pylint",
+    "python.linting.pylintArgs": ["--load-plugins", "pylint_django"],
+    "python.linting.pylintEnabled": true,
+    "python.jediEnabled": true,
+    "python.analysis.disabled": [
+        "unresolved-import"
+    ],
+    "python.autoComplete.extraPaths": [
+        "/"
+    ],
+    // "python.venvPath": "${workspaceFolder}/env/bin/python3",
+    "python.linting.pycodestyleArgs": ["--ignore=E501"],
+    "files.exclude": {
+      "**/*.pyc": true
+    }
+  }

@@ -1,7 +1,8 @@
 .idea/
-.vscode/
 *.sqlite3
 *.pyc
 */__pycache__
-.env
 images/
+*.json
+*.env
+
