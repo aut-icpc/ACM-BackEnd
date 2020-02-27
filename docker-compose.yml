@@ -38,22 +38,6 @@ services:
       - 5432:5432
     volumes:
       - pgdata:/var/lib/postgresql/data
-  rabbitmq:
-    image: rabbitmq:latest
-    # hostname: rabbitmq
-    environment: 
-      - HOSTNAME=rabbitmq
-    ports: 
-      - "5671:5671"
-      - "5672:5672"
-      - "25672:25672"
-      - "15671:15671"
-      - "15672:15672"
-    healthcheck:
-        test: ["CMD", "curl", "-f", "http://localhost:15672"]
-        interval: 30s
-        timeout: 10s
-        retries: 5
 
 
 volumes:
