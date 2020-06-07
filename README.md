@@ -16,7 +16,7 @@ AUT ICPC website can be deployed with either docker swarm or a single docker com
 
 In this method you can configure gitlab ci/cd runner. If you don't need to have continuous deployment or integration, you can safely skip this step.
 
-1. Install gitlab runner on the server. Read documentions [here](https://docs.gitlab.com/runner/install/linux-repository.html).
+1. Install gitlab runner on the server. Read documentations [here](https://docs.gitlab.com/runner/install/linux-repository.html).
 
 2. Obtain runner token from our gitlab instance. It can be found in group's settings. Remind that just the owner of the group can have access to this part. You can read more [here](https://docs.gitlab.com/runner/register/). Remind that address of gitlab should have **https**.
 
