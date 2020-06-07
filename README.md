@@ -55,4 +55,4 @@ docker push acm-registry:5000/postgres:11
 6. Clone NGINGX repository and follow instrctions [here](https://git.ceit.aut.ac.ir/ssc/icpc/nginx).
 
 ## Method2: Running with single swarm file
-Frankly I've skipped on doing this for so long I've forgotten what was I supposed to do, hopefully I'll remember.
+Frankly I've skipped on doing this for so long I've forgotten what I was supposed to do, hopefully I'll remember.
