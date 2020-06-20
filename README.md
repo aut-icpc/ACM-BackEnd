@@ -1,7 +1,7 @@
 # ACM-BackEnd
 Backend for ACM-ICPC Registration Website
 
-NOTE: This is a Django project, the only reason why GitHub thinks that it's in JavaScript is because the static files of its dependencies didn't work in production so I had to put them alongside the main files. :))))
+NOTE: This is a Django project, the only reason why GitHub thinks that it's in JavaScript is because the static files of its dependencies didn't work in production, so I had to put them alongside the main files. :))))
 
 # AUT ICPC Website documents
 
@@ -52,7 +52,7 @@ docker push acm-registry:5000/postgres:11
 
 5. Clone application and follow instructions [here](https://git.ceit.aut.ac.ir/ssc/icpc/acm-backend).
 
-6. Clone NGINGX repository and follow instrctions [here](https://git.ceit.aut.ac.ir/ssc/icpc/nginx).
+6. Clone NGINX repository and follow instrctions [here](https://git.ceit.aut.ac.ir/ssc/icpc/nginx).
 
 ## Method2: Running with single swarm file
 Frankly I've skipped on doing this for so long I've forgotten what I was supposed to do, hopefully I'll remember.
