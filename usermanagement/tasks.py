@@ -12,7 +12,7 @@ def enqueue_mail(team_instance, subject, content):
 
         
 
-def send_rq_mail(teamName, mailAddresses, mailSubject, mailContent, user=None, password=None):
+def send_rq_mail(mailAddresses, mailSubject, mailContent, user=None, password=None):
     r = conf.redis_limit_cursor
     # it returns a byte, so it has to be cast to an integer.
     mails_left = float(r.get('mails_left'))
