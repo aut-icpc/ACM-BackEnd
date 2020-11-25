@@ -5,6 +5,9 @@ NOTE: This is a Django project, the only reason why GitHub thinks that it's in J
 
 # AUT ICPC Website documents
 
+** This project is no longer deployed using docker (except its nginx), so the below methods aren't that accurate. **
+
+
 AUT ICPC website can be deployed with either Swarm or a single docker-compose file. This document will explain both methods. But before doing any actions these Docker images should already exist on the server. (You should pull them from Docker Hub):
 
 * postgres:11
