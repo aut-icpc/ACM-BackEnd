@@ -15,7 +15,9 @@ from .models import (
 from .forms import (
     OnlineTeamForm,
     OnsiteTeamForm,
+    MailMessageForm,
     ExportTeamForm,
+    SendCustomEmailForm,
 )
 
 from .api.serializers import (
@@ -45,7 +47,7 @@ class TeamAdmin(admin.ModelAdmin):
         custom_urls = [
             url(r'export_teams/$',
             self.admin_site.admin_view(self.export_teams),
-            name='contests_export_teams')
+            name='usermanagement_export_teams')
         ]
         return custom_urls + urls
 
@@ -83,7 +85,7 @@ class OnsiteTeamAdmin(TeamAdmin):
         custom_urls = [
             url(r'export_teams/$',
             self.admin_site.admin_view(self.export_teams),
-            name='contests_export_onsite_teams')
+            name='usermanagement_export_onsite_teams')
         ]
         return custom_urls + urls
     
@@ -99,7 +101,7 @@ class OnlineTeamAdmin(TeamAdmin):
         custom_urls = [
             url(r'export_teams/$',
             self.admin_site.admin_view(self.export_teams),
-            name='contests_export_online_teams')
+            name='usermanagement_export_online_teams')
         ]
         return custom_urls + urls
 
@@ -126,10 +128,51 @@ class OnlineContestantAdmin(ContestantAdmin):
     class Meta:
         model = OnlineContestant
 
+class MailMessageAdmin(admin.ModelAdmin):
+    change_list_template = "change_list_mailmessage.html"
+    send_custom_template = "send_custom_email.html"
+
+    form = MailMessageForm
+
+    def get_urls(self):
+        urls = super(MailMessageAdmin, self).get_urls()
+        custom_urls = [
+            url(r'send_custom_emails/$',
+            self.admin_site.admin_view(self.send_custom_emails),
+            name='usermanagement_send_custom_emails')
+        ]
+        # Always add customs first to avoid problems
+        return custom_urls + urls
+
+    def send_custom_emails(self, request):
+        context = {
+            'title': ('Send Custom Emails'),
+            'app_label': self.model._meta.app_label,
+            'opts': self.model._meta,
+            'has_change_permission': self.has_change_permission(request)
+        }
+        if request.method == 'POST':
+            send_form = SendCustomEmailForm(request.POST)
+            if send_form.is_valid():
+                # raise Exception(self.__class__)
+                return send_form.save()
+        else:
+            send_form = SendCustomEmailForm()
+        context['form'] = send_form
+        context['adminform'] = helpers.AdminForm(send_form,
+                                                 list([(None, {'fields': send_form.base_fields})]),
+                                                 {})
+
+        return render(request, self.send_custom_template, context)
+
+
+    class Meta:
+        model = MailMessage
+
 
 admin.site.register(OnsiteTeam, OnsiteTeamAdmin)
 admin.site.register(OnlineTeam, OnlineTeamAdmin)
 admin.site.register(OnlineContestant, OnlineContestantAdmin)
 admin.site.register(OnsiteContestant, OnsiteContestantAdmin)
 admin.site.register(Country)
-admin.site.register(MailMessage)
+admin.site.register(MailMessage, MailMessageAdmin)

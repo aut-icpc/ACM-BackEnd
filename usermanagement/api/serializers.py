@@ -1,8 +1,7 @@
 from rest_framework import serializers
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
-from ..utils import generate_user_from_email
-from .utils import createContestants, validate_contestants
+from .utils import create_contestants, validate_contestants
 
 from usermanagement.models import (
     Country,
@@ -16,12 +15,15 @@ from usermanagement.models import (
 
 contestant_fields = ['first_name', 'last_name', 'gender', 'edu_level', 'student_number', 'email']
 onsite_contestant_fields = contestant_fields + ['phone_number', 'shirt_size']
+
 team_fields = ['name', 'institution', 'contestants'] 
 online_fields = ['country', ]
 online_team_fields = team_fields + online_fields
-create_onsite_team_fields = team_fields + ['recaptcha', ]
+
+create_onsite_team_fields = team_fields + ['recaptcha', 'is_high', ]
 create_online_team_fields = create_onsite_team_fields + online_fields
-generate_team_fields = ['name', 'institution']
+
+generate_team_fields = ['name', 'institution', 'user', 'password']
 generate_online_team_fields = generate_team_fields + online_fields
 generate_contestant_fields = ['team', 'institution']
 
@@ -53,7 +55,7 @@ class OnsiteTeamSerializer(serializers.ModelSerializer):
         fields = create_onsite_team_fields
 
     def create(self, validated_data):
-        team = createContestants(validated_data, OnsiteTeam, OnsiteContestant)
+        team = create_contestants(validated_data, OnsiteTeam, OnsiteContestant)
         return team
 
     def validate(self, data):
@@ -74,7 +76,7 @@ class OnlineTeamSerializer(serializers.ModelSerializer):
         # String
 
     def create(self, validated_data):
-        team = createContestants(validated_data, OnlineTeam, OnlineContestant)
+        team = create_contestants(validated_data, OnlineTeam, OnlineContestant)
         return team
 
     def validate(self, data):
@@ -98,15 +100,11 @@ class OnsiteTeamListSerializer(serializers.ModelSerializer):
 
 
 class OnlineTeamGenerateSerializer(OnlineTeamSerializer):
-    user = serializers.SerializerMethodField()
 
     class Meta:
         model = OnlineTeam
-        fields = generate_online_team_fields + ['user', 'password']
+        fields = generate_online_team_fields
 
-    def get_user(self, obj):
-        user = generate_user_from_email(obj.contestants.all()[0].email)
-        return user
 
 class OnsiteTeamGenerateSerializer(OnsiteTeamSerializer):
     class Meta:

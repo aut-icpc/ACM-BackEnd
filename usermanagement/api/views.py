@@ -6,7 +6,7 @@ from rest_framework.generics import (
 
 from django.db import IntegrityError
 from django.core.exceptions import SuspiciousOperation
-from .utils import validateRecaptcha
+from .utils import validate_recaptcha
 
 from usermanagement.models import (
     Country,

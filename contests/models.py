@@ -13,7 +13,7 @@ import logging
 
 
 
-class Contest (models.Model):
+class Contest(models.Model):
     year = models.CharField(max_length=4, default="")
     problems = models.CharField(max_length=500) 
     final_ranking_onsite = models.CharField(max_length=500)
@@ -35,8 +35,16 @@ def get_latest_contest():
 class CurrentContest(models.Model):
     main = models.ForeignKey(Contest, on_delete=models.SET('get_latest_contest'))
     sponsor = models.ImageField()
+
+    # These two should be entererd very carefully before opening the contest's registaration!
+    online_team_starting_user_count = models.IntegerField(default=0)
+    onsite_team_starting_user_count = models.IntegerField(default=0)
+
     class Meta:
         verbose_name_plural = 'Current Contest'
+
+    def __str__(self):
+        return self.main.__str__()
 
     @property
     def get_current_poster(self):
@@ -106,6 +114,8 @@ class Photo(RawPhoto):
 
     def get_absolute_url(self):
         return os.path.join(settings.MEDIA_URL, self.image.name)
+
+    # The following two methods have been extracted directly from the library and modified slightly to make them compatible with our versions of library's models
 
     def pre_cache(self):
         photosize = self.thumbnail_size

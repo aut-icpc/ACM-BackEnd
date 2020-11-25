@@ -5,8 +5,8 @@
 {% block object-tools-items %}
   {{ block.super }}
   <li>
-    <a href="{% url "admin:usermanagement_export_online_teams" %}" class="addlink">
-      {% trans "Export teams!" %}
+    <a href="{% url "admin:usermanagement_send_custom_emails" %}" class="addlink">
+      {% trans "Send Custom emails" %}
     </a>
   </li>
 {% endblock %}

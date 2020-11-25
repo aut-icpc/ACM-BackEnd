@@ -1,36 +1,28 @@
-from django.core.mail import send_mail as sendMail
+from django.core.mail import send_mail as django_send_mail
 from django.conf import settings
-import json
+import datetime
 from io import BytesIO
 from django.http import FileResponse
 
 
-def generate_user_from_email(email):
-    return email.replace("@", "")
+def seconds_until_end_of_day(dt=None):
+    if dt is None:
+        dt = datetime.datetime.now()
+    return ((24 - dt.hour - 1) * 60 * 60) + ((60 - dt.minute - 1) * 60) + (60 - dt.second)
 
-def generate_email_json(teamName, mailAddress, mailSubject, mailContent, password=None):
-    email_json = {
-        'teamName': teamName,
-        "mailAddress": mailAddress,
-        "mailSubject": mailSubject,
-        "mailContent": mailContent,
-        "password": password
-    }
-    return email_json
+def send_mail(recipients, subject, content, user=None, password=None):
 
-def send_mail(teamName, email, mailSubject, mailContent, password=None):
-
-    subject = mailSubject
-    message = mailContent
+    message = content
     if password:
-        message += "\n\n Your user is: %s \n Your password is %s" % (generate_user_from_email(email), password)
-    email_from = settings.EMAIL_HOST_USER
-    recipient_list = [email, ]   
-    sendMail(subject, "", email_from, recipient_list, html_message=message)
+        message += "\n\n Your user is: %s \n Your password is %s" % (user, password)
+    # email_from = settings.EMAIL_FROM
+    email_from = "\"{}\" <{}>".format(settings.EMAIL_FROM, settings.EMAIL_HOST_USER)
+    # recipient_list = [email, ]   
+    django_send_mail(subject, "", email_from, recipients, html_message=message)
 
 
 def export_teams(adminType, is_finalized):
-     # I seriously tried to avoid this bullcrap, but finally because of serializers there was no ducking conditions.
+     # I seriously tried to avoid this bullcrap, but because of serializers there was no ducking conditions.
 
     from .admin import OnlineTeamAdmin, OnsiteTeamAdmin
     from .api.serializers import OnsiteTeamGenerateSerializer, OnlineTeamGenerateSerializer
@@ -43,7 +35,7 @@ def export_teams(adminType, is_finalized):
         team_class = OnsiteTeam
         serializer_class = OnsiteTeamGenerateSerializer
     if is_finalized:
-        teams = team_class.objects.filter(status='PAID')
+        teams = team_class.objects.filter(status='FINALIZED')
     else:
         teams = team_class.objects.all()
     serializer = serializer_class(teams, many=True)
@@ -69,7 +61,7 @@ def export_contestants(adminType, is_finalized):
         contestants_all = contestant_class.objects.all()
         for contestant in contestants_all:
             team_ptr = getattr(contestant.team, team_class)
-            if team_ptr.status == 'PAID':
+            if team_ptr.status == 'FINALIZED':
                 team_ids.append(team_ptr.id)
         contestants = contestant_class.objects.filter(team__id__in=team_ids).order_by('team__name')
     else:
@@ -90,31 +82,65 @@ def create_sv_response(sv_str, file_name):
 # Separator is either comma or a tab character
 
 def generate_sv_str(headers, separator):
+    headers = [str(header) if header else "PLACEHOLDER" for header in headers]
     return separator.join(headers) + '\n'
 
 
-def generate_current_line(headers, record, separator):
-    currentLine = []
+def generate_current_line(headers, record, separator, judge=None, judge_type=None):
+    headers = headers.copy()
+    if judge:
+        if judge_type == 'TEAMS':
+            # The nested cast is there to remove the zeros and leave the number intact.
+            try:
+                team_number = str(int(record['user'].split('-')[1]))
+            except:
+                from random import randint
+                team_number = randint(0, 200)
+            # the 3 is probably #contestants
+            currentLine = [team_number, '\t', '3']
+        else:
+            currentLine = ['team']
+    else:
+        currentLine = []
     for header in headers:
         if header in record.keys():
             currentLine.append(record[header])
         else:
             currentLine.append('')
+
+    if judge:
+        if judge_type == 'TEAMS':
+            abbr = ''.join(w[0].upper() for w in record['institution'].split())
+            currentLine.append(abbr[:3])
+            if 'country' not in headers:
+                currentLine.append('IRN')
     add_str = generate_sv_str(currentLine, separator)
     return add_str
 
 
-def team_json_to_sv_file_response(json_obj, file_name, separator):
+def team_json_to_sv_file_response(json_obj, file_name, separator, judge=None, judge_type=None):
 
      # Keep track of headers in a set
-    headers = json_obj[0].keys()
+    headers = list(json_obj[0].keys())
 
     # You only know what headers were there once you have read all the JSON once.
     # Now we have all the information we need, like what all possible headers are.
-    
-    sv_str = generate_sv_str(headers, separator)
+    if judge:
+        sv_str = judge_type.lower() + separator + '1' + '\n'
+        if judge_type == 'TEAMS':
+            headers.remove('user')
+            headers.remove('password')
+        else:
+            headers.remove('institution')
+            try:
+                headers.remove('country')
+            except:
+                pass
+    else:
+        sv_str = generate_sv_str(headers, separator)
+
     for record in json_obj:
-        sv_str += generate_current_line(headers, record, separator)
+        sv_str += generate_current_line(headers, record, separator, judge, judge_type)
     
     return create_sv_response(sv_str, file_name)
 

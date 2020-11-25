@@ -1,9 +1,12 @@
+import uuid
 from django.db import models
 from django.contrib.postgres import fields
 from django.core.validators import RegexValidator, EmailValidator
 from django.conf import settings
-from .utils import generate_email_json, send_mail
-import uuid
+from usermanagement.tasks import enqueue_mail
+from usermanagement.apps import UsermanagementConfig as config
+from contests.models import CurrentContest
+
 
 EDU_LEVEL_CHOICES = (
     ('BSC', 'BSc'),
@@ -27,17 +30,15 @@ T_SHIRT_SIZE_CHOICES = (
 
 TEAM_STATUS_CHOICES = (
     ('PENDING', 'Pending Approval'),
-    ('APPROVED', 'Approved for payment'),
-    ('REJECTED', 'Denied Participation')
+    ('REJECTED', 'Denied Participation'),
+    ('FINALIZED', 'Finalized Registration'),
 )
 
 ONSITE_TEAM_STATUS_CHOICES = (
-    ('PAID', 'Finalized Registration'),
+    ('APPROVED', 'Approved for payment'),
     ('RESERVED', 'Reserved registration beforehand') ) + TEAM_STATUS_CHOICES
 
-#TODO: This should be changed as online teams have no payment process.
 ONLINE_TEAM_STATUS_CHOICES = () + TEAM_STATUS_CHOICES
-
 
 class Country(models.Model):
     name = models.CharField(max_length=255)
@@ -51,18 +52,22 @@ class Country(models.Model):
 
 
 class MailMessage(models.Model):
-    paid_subject = models.TextField(default='Paid')
-    reserved_subject = models.TextField(default="Reserved registration beforehand")
     pending_subject = models.TextField(default="Pending")
-    approved_subject = models.TextField(default="Approved for participation")
-    denied_subject = models.TextField(default="Denied Participation")
-    online_subject = models.TextField(default="")
-
-    paid_content = models.TextField(default="")
-    reserved_content = models.TextField(default="")
     pending_content = models.TextField(default="")
+
+    rejected_subject = models.TextField(default="Rejected")
+    rejected_content = models.TextField(default="")
+
+    finalized_subject = models.TextField(default="Finalized")
+    finalized_content = models.TextField(default="")
+
+    approved_subject = models.TextField(default="Approved for participation")
     approved_content = models.TextField(default="")
-    denied_content = models.TextField(default="")
+
+    reserved_subject = models.TextField(default="Reserved registration beforehand")
+    reserved_content = models.TextField(default="")
+
+    online_subject = models.TextField(default="Online Contest Registration")
     online_content = models.TextField(default="")
 
     @classmethod
@@ -81,61 +86,91 @@ class MailMessage(models.Model):
 class Team(models.Model):
     name = models.CharField(max_length=25, unique=True)
     institution = models.CharField(max_length=50)
+    user = models.CharField(max_length=10, unique=True, blank=True, null=True)
+    password = models.CharField(max_length=20, blank=True, null=True)
 
     email = ""
+    emails = []
 
     def __str__(self):
         return self.name
 
     def get_email(self):
         return self.email or self.contestants.get(is_primary=True).email
-    
-    def send_team_mail(self, password=None, override_status=None):
-        status = override_status or self.status
-        mailmessage = MailMessage.load()
 
-        #TODO: Add sending password by default!
-        
-        if self.sendNewMail:
-            if status == 'PENDING':
-                send_mail(self.name, self.get_email(), mailmessage.pending_subject, mailmessage.pending_content)
-            elif status == 'APPROVED':
-                send_mail(self.name, self.get_email(), mailmessage.online_subject, mailmessage.online_content)
+    def get_emails(self):
+        return self.emails or list(self.contestants.values_list('email', flat=True))
 
+    def get_user_pass_and_increment_base(self, self_type):
+        currentC = CurrentContest.load()
+        if self_type == 'online':
+            number = currentC.online_team_starting_user_count
+            currentC.online_team_starting_user_count += 1
+        elif self_type == 'onsite':
+            number = currentC.onsite_team_starting_user_count
+            currentC.onsite_team_starting_user_count += 1
+        currentC.save()
+        user = 'team-' + str(number).zfill(3)
+        password = uuid.uuid4().hex[:8]
+        return user, password
 
 
 class OnlineTeam(Team):
     country = models.ForeignKey(Country, on_delete=models.CASCADE)
-    status = models.CharField(max_length=20, choices=ONLINE_TEAM_STATUS_CHOICES, default='APPROVED')
-    password = models.CharField(max_length=20, default="")
+    status = models.CharField(max_length=20, choices=ONLINE_TEAM_STATUS_CHOICES, default='PENDING')
 
-    # Online team is accepted by default, unless something changes. 
     def save(self, *args, **kwargs):
+        try:
+            if self.sendNewMail:
+                if self.status == 'FINALIZED' and self.user == None:
+                    self.user, self.password = self.get_user_pass_and_increment_base('online')
 
-        self.password = uuid.uuid4().hex[:8]
-        self.send_team_mail(override_status='APPROVED')
+                mailmessage = MailMessage.load()
+                enqueue_mail(self, mailmessage.online_subject, mailmessage.online_content)
+        except:
+            pass
         super(OnlineTeam, self).save(*args, **kwargs)
-
 
 
 class OnsiteTeam(Team):
     status = models.CharField(max_length=50, choices=ONSITE_TEAM_STATUS_CHOICES, default="PENDING")
+    is_high = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
-       
-        self.send_team_mail()
-        super(OnsiteTeam, self).save(*args, **kwargs)        
+        try:
+            if self.sendNewMail:
+                mailmessage = MailMessage.load()
+                if self.status == 'PENDING':
+                    subject, content = mailmessage.pending_subject, mailmessage.pending_content
+                elif self.status == 'RESERVED':
+                    subject, content = mailmessage.reserved_subject, mailmessage.reserved_content
+                elif self.status == 'APPROVED':
+                    subject, content = mailmessage.approved_subject, mailmessage.approved_content
+                elif self.status == 'FINALIZED':
+                    subject, content = mailmessage.finalized_subject, mailmessage.finalized_content
+                    if self.user == None:
+                        self.user, self.password = self.get_user_pass_and_increment_base('onsite')
+                elif self.status == 'REJECTED':
+                    subject, content = mailmessage.rejected_subject, mailmessage.rejected_content
+                
+                enqueue_mail(self, subject, content)
+        except:
+            pass
+        
+        super(OnsiteTeam, self).save(*args, **kwargs)
 
+       
 
 class Contestant(models.Model):
     phone_validator = RegexValidator(regex=r"^(\+98|0)?9\d{9}$", message="Phone number must be entered correctly.")
     email_validator = EmailValidator(message="Email must be entered correctly.")
+    student_number_validator = RegexValidator(regex=r"\d{1,20}")
 
     first_name = models.CharField(max_length=30)
     last_name = models.CharField(max_length=30)
     gender = models.CharField(max_length=5, choices=GENDER_CHOICES)
     edu_level = models.CharField(max_length=3, choices=EDU_LEVEL_CHOICES, default='BSC')
-    student_number = models.CharField(max_length=20)
+    student_number = models.CharField(validators=[student_number_validator], max_length=20)
     email = models.CharField(max_length=100, unique=True, validators=[email_validator])
     phone_number = models.CharField(validators=[phone_validator], blank=True, max_length=20, null=True)
     team = models.ForeignKey(Team, on_delete=models.CASCADE, related_name='contestants')

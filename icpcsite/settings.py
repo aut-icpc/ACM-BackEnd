@@ -22,9 +22,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# DEBUG = False if os.getenv('DEBUG_MODE') == 'True' else False
 DEBUG = False
-# DEBUG = True
 
 ALLOWED_HOSTS = [
     'localhost',
@@ -49,7 +47,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'photologue',
     'sortedm2m',
-    # 'ckeditor',
+    'django_rq',
 
     'contests',
     'mainsite',
@@ -128,6 +126,21 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+# Django-Rq data
+# https://github.com/rq/django-rq
+
+REDIS_MAIL_URL = os.getenv('REDIS_MAIL_URL', 'redis://redis:6379/0')
+REDIS_LIMIT_URL = os.getenv('REDIS_LIMIT_URL', 'redis://redis:6379/1')
+MAILING_LIMIT = float(os.getenv('MAIL_LIMIT', 95))
+MAIL_DELAY = int(os.getenv('MAIL_DELAY_SEC', 10))
+
+RQ_QUEUES = {
+    'emails': {
+        'URL': REDIS_MAIL_URL,
+        'DEFAULT_TIMEOUT': 500,
+    },
+}
+
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/
 
@@ -145,8 +158,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.2/howto/static-files/
 
+WWW_DIR = os.getenv('WWW_DIR')
+
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+STATIC_ROOT = os.path.join(WWW_DIR, 'static')
+# STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
 ## Should be uncommented in production!
@@ -154,19 +170,12 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 #     os.getenv('WHITELIST'),
 # ]
 
-MEDIA_ROOT = os.path.join(BASE_DIR, 'images')
+MEDIA_ROOT = os.path.join(WWW_DIR, 'images')
 MEDIA_URL = '/images/'
 
-# STATICFILES_DIRS = [
-#     MEDIA_ROOT,
-#     'static/',
-#     os.path.join(BASE_DIR, "static"),
-#     '/var/www/static/',
-# ]
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_USE_TLS = True if os.getenv('EMAIL_USE_TLS') == 'True' else False
+EMAIL_HOST = os.getenv('EMAIL_HOST', 'smtp.gmail.com')
+EMAIL_FROM = os.getenv('EMAIL_FROM', 'AUT-ICPC')
 EMAIL_USE_TLS = True
 EMAIL_PORT = int(os.getenv('EMAIL_PORT') or 587)
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
@@ -178,4 +187,3 @@ CORS_ORIGIN_ALLOW_ALL = True
 SITE_ID = 1
 
 GOOGLE_RECAPTCHA_SECRET_KEY = os.getenv('GOOGLE_RECAPTCHA_SECRET_KEY')
-

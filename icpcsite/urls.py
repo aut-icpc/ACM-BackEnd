@@ -24,6 +24,7 @@ urlpatterns = [
     path('api/', include('mainsite.api.urls')),
     path('api/', include('usermanagement.api.urls')),
     path('api/', include('contests.api.urls')),
+    path('django-rq/', include('django_rq.urls')),
     url(r'^photologue/', include('photologue.urls', namespace='photologue')),
     url(r'^admin_tools', include('admin_tools.urls')),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) 

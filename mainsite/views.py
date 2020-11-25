@@ -13,7 +13,7 @@ ACM_WEBSITE = os.path.join(FRONT_BASE, "acmWebsite")
 
 # Create your views here.
 
-def index (request):
+def index(request):
     return render(request, 'index.html', {
         "PUBLIC_URL": os.path.join(ACM_WEBSITE, "public")
     })

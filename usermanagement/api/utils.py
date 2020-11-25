@@ -11,7 +11,7 @@ class TemporarilyUnavailable(APIException):
     default_detail = 'Service temporarily unavailable, try again later.'
     default_code = 'service_unavailable'
 
-def check_uniquity(contestant_list):
+def check_uniqueness(contestant_list):
     meta = contestant_list[0]._meta
     model = meta.model
     model_fields = meta.get_fields()
@@ -42,50 +42,39 @@ def check_uniquity(contestant_list):
             raise SuspiciousOperation("Similar contestant already present in the database!")
 
 
-# True for saving, false for validation
-def createTeamsAndContestants(validated_data, TeamType, ContestantType, team, contestants_data, main_contestant_data, save=False):
-    if save:
-        try:
-            team.sendNewMail = True
-            team.save()
-        except:
-            raise TemporarilyUnavailable()
-    # Cleaning team fields is redundant because there's only one of it and it gets created/saved before everything else.
-
-    main_contestant = ContestantType(team=team, **main_contestant_data)
+def validate_uniqueness(validated_data, contestantType, team, contestants_data, main_contestant_data):
+    main_contestant = contestantType(team=team, **main_contestant_data)
     main_contestant.is_primary = True
     contestants = [main_contestant,]
     for contestant_data in contestants_data[1:]:
-        contestant = ContestantType(team=team, **contestant_data)
+        contestant = contestantType(team=team, **contestant_data)
         contestants.append(contestant)
-    
-    if not save:
-        check_uniquity(contestants)
-    else:
-        for contestant in contestants:
-            contestant.save()
-    
-    if save:
-        return team
+        
+    check_uniqueness(contestants)
+    return contestants
 
-
-def createContestants(validated_data, TeamType, ContestantType):
+def create_contestants(validated_data, TeamType, ContestantType):
     
     contestants_data = validated_data.pop('contestants')
     main_contestant_data = contestants_data[0]
     team = TeamType(**validated_data)
     team.email = main_contestant_data['email']
+    team.emails = [data['email'] for data in contestants_data]
 
-    # Temporary Change: because Reza wants to deny teams from specific countries
-    if TeamType is OnlineTeam:
-        team.status = 'PENDING'
+    contestants = validate_uniqueness(validated_data, ContestantType, team, contestants_data, main_contestant_data)
+    try:
+        team.sendNewMail = True
+        team.save()
+    except:
+        raise
+    # contestants = validate_uniqueness(validated_data, ContestantType, team, contestants_data, main_contestant_data)
+    for contestant in contestants:
+        contestant.team = team
+        contestant.save()
+    return team
 
-    #TODO: I feel like this part of code could be more optimized.
-    createTeamsAndContestants(validated_data, TeamType, ContestantType, team, contestants_data, main_contestant_data)
-    return createTeamsAndContestants(validated_data, TeamType, ContestantType, team, contestants_data, main_contestant_data, save=True)
 
-
-def validateRecaptcha(request):
+def validate_recaptcha(request):
     recaptcha_response = request.data['recaptcha']
     url = 'https://www.google.com/recaptcha/api/siteverify'
     values = {
