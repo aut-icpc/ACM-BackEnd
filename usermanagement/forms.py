@@ -22,7 +22,7 @@ import io
 
 class TeamForm(forms.ModelForm): 
 
-    do_email = forms.BooleanField(initial=False, label="Send new Email?", required=False, 
+    do_email = forms.BooleanField(initial=True, label="Send new Email?", required=False, 
     help_text="""If you don't check this field when finalizing a team, It'll not generate a user/pass for them.""")
 
     def clean(self):
