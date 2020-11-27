@@ -134,7 +134,7 @@ class OnlineTeam(Team):
 
 class OnsiteTeam(Team):
     status = models.CharField(max_length=50, choices=ONSITE_TEAM_STATUS_CHOICES, default="PENDING")
-    is_high = models.BooleanField(default=False)
+    is_high = models.BooleanField(default=False, help_text="Is it a team from high-schools?")
 
     def save(self, *args, **kwargs):
         try:
