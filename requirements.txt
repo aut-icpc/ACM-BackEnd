@@ -5,7 +5,7 @@ django-photologue==3.10
 django-sortedm2m==2.0.0
 djangorestframework==3.11.2
 ExifRead==2.1.2
-Pillow==9.0.0
+Pillow==9.0.1
 psycopg2==2.8.3
 python-dotenv==0.10.3
 pytz==2019.2
