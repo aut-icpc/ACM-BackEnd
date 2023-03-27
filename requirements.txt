@@ -13,4 +13,4 @@ six==1.12.0
 sqlparse==0.3.0
 rq==1.2.2
 django-rq==2.3.0
-redis==3.4.1
+redis==4.5.3
