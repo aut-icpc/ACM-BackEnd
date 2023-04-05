@@ -1,4 +1,4 @@
-Django==2.2.27
+Django==2.2.28
 django-admin-tools==0.8.1
 django-cors-headers==3.1.0
 django-photologue==3.10
