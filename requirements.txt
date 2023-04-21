@@ -10,7 +10,7 @@ psycopg2==2.8.3
 python-dotenv==0.10.3
 pytz==2019.2
 six==1.12.0
-sqlparse==0.3.0
+sqlparse==0.4.4
 rq==1.2.2
 django-rq==2.3.0
 redis==4.4.4
